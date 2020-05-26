@@ -560,7 +560,7 @@
                                 <arg>/entrypoint.sh</arg>
                             </entrypoint>
                             <ports>
-                                <port>8084</port>
+                                <port>8083</port>
                                 <port>5701/udp</port>
                             </ports>
                             <environment>
