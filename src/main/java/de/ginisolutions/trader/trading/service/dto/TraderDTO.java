@@ -1,44 +1,33 @@
-package de.ginisolutions.trader.trading.domain;
+package de.ginisolutions.trader.trading.service.dto;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import io.swagger.annotations.ApiModel;
 import javax.validation.constraints.*;
-
 import java.io.Serializable;
 
 /**
- * The Trader entity.\n@author A true hipster
+ * A DTO for the {@link de.ginisolutions.trader.trading.domain.Trader} entity.
  */
-@Document(collection = "trader")
-public class Trader implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    @Id
+@ApiModel(description = "The Trader entity.\n@author A true hipster")
+public class TraderDTO implements Serializable {
+    
     private String id;
 
     @NotNull
-    @Field("name")
     private String name;
 
     @NotNull
-    @Field("owner")
     private String owner;
 
     @NotNull
-    @Field("api_key")
     private String apiKey;
 
     @NotNull
-    @Field("api_secret")
     private String apiSecret;
 
     @NotNull
-    @Field("attributes")
     private String attributes;
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here
+    
     public String getId() {
         return id;
     }
@@ -51,22 +40,12 @@ public class Trader implements Serializable {
         return name;
     }
 
-    public Trader name(String name) {
-        this.name = name;
-        return this;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
 
     public String getOwner() {
         return owner;
-    }
-
-    public Trader owner(String owner) {
-        this.owner = owner;
-        return this;
     }
 
     public void setOwner(String owner) {
@@ -77,22 +56,12 @@ public class Trader implements Serializable {
         return apiKey;
     }
 
-    public Trader apiKey(String apiKey) {
-        this.apiKey = apiKey;
-        return this;
-    }
-
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
     }
 
     public String getApiSecret() {
         return apiSecret;
-    }
-
-    public Trader apiSecret(String apiSecret) {
-        this.apiSecret = apiSecret;
-        return this;
     }
 
     public void setApiSecret(String apiSecret) {
@@ -103,25 +72,20 @@ public class Trader implements Serializable {
         return attributes;
     }
 
-    public Trader attributes(String attributes) {
-        this.attributes = attributes;
-        return this;
-    }
-
     public void setAttributes(String attributes) {
         this.attributes = attributes;
     }
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Trader)) {
+        if (!(o instanceof TraderDTO)) {
             return false;
         }
-        return id != null && id.equals(((Trader) o).id);
+
+        return id != null && id.equals(((TraderDTO) o).id);
     }
 
     @Override
@@ -132,7 +96,7 @@ public class Trader implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "Trader{" +
+        return "TraderDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", owner='" + getOwner() + "'" +

@@ -2,7 +2,7 @@
   "generator-jhipster": {
     "authenticationType": "oauth2",
     "cacheProvider": "hazelcast",
-    "serverPort": "8083",
+    "serverPort": "8092",
     "serviceDiscoveryType": "eureka",
     "skipUserManagement": true,
     "baseName": "tradingService",

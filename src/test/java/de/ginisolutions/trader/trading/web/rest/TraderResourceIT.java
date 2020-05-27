@@ -4,6 +4,9 @@ import de.ginisolutions.trader.trading.TradingServiceApp;
 import de.ginisolutions.trader.trading.config.TestSecurityConfiguration;
 import de.ginisolutions.trader.trading.domain.Trader;
 import de.ginisolutions.trader.trading.repository.TraderRepository;
+import de.ginisolutions.trader.trading.service.TraderService;
+import de.ginisolutions.trader.trading.service.dto.TraderDTO;
+import de.ginisolutions.trader.trading.service.mapper.TraderMapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +50,12 @@ public class TraderResourceIT {
 
     @Autowired
     private TraderRepository traderRepository;
+
+    @Autowired
+    private TraderMapper traderMapper;
+
+    @Autowired
+    private TraderService traderService;
 
     @Autowired
     private MockMvc restTraderMockMvc;
@@ -94,9 +103,10 @@ public class TraderResourceIT {
     public void createTrader() throws Exception {
         int databaseSizeBeforeCreate = traderRepository.findAll().size();
         // Create the Trader
+        TraderDTO traderDTO = traderMapper.toDto(trader);
         restTraderMockMvc.perform(post("/api/traders").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(trader)))
+            .content(TestUtil.convertObjectToJsonBytes(traderDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Trader in the database
@@ -116,11 +126,12 @@ public class TraderResourceIT {
 
         // Create the Trader with an existing ID
         trader.setId("existing_id");
+        TraderDTO traderDTO = traderMapper.toDto(trader);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restTraderMockMvc.perform(post("/api/traders").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(trader)))
+            .content(TestUtil.convertObjectToJsonBytes(traderDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Trader in the database
@@ -136,11 +147,12 @@ public class TraderResourceIT {
         trader.setName(null);
 
         // Create the Trader, which fails.
+        TraderDTO traderDTO = traderMapper.toDto(trader);
 
 
         restTraderMockMvc.perform(post("/api/traders").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(trader)))
+            .content(TestUtil.convertObjectToJsonBytes(traderDTO)))
             .andExpect(status().isBadRequest());
 
         List<Trader> traderList = traderRepository.findAll();
@@ -154,11 +166,12 @@ public class TraderResourceIT {
         trader.setOwner(null);
 
         // Create the Trader, which fails.
+        TraderDTO traderDTO = traderMapper.toDto(trader);
 
 
         restTraderMockMvc.perform(post("/api/traders").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(trader)))
+            .content(TestUtil.convertObjectToJsonBytes(traderDTO)))
             .andExpect(status().isBadRequest());
 
         List<Trader> traderList = traderRepository.findAll();
@@ -172,11 +185,12 @@ public class TraderResourceIT {
         trader.setApiKey(null);
 
         // Create the Trader, which fails.
+        TraderDTO traderDTO = traderMapper.toDto(trader);
 
 
         restTraderMockMvc.perform(post("/api/traders").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(trader)))
+            .content(TestUtil.convertObjectToJsonBytes(traderDTO)))
             .andExpect(status().isBadRequest());
 
         List<Trader> traderList = traderRepository.findAll();
@@ -190,11 +204,12 @@ public class TraderResourceIT {
         trader.setApiSecret(null);
 
         // Create the Trader, which fails.
+        TraderDTO traderDTO = traderMapper.toDto(trader);
 
 
         restTraderMockMvc.perform(post("/api/traders").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(trader)))
+            .content(TestUtil.convertObjectToJsonBytes(traderDTO)))
             .andExpect(status().isBadRequest());
 
         List<Trader> traderList = traderRepository.findAll();
@@ -208,11 +223,12 @@ public class TraderResourceIT {
         trader.setAttributes(null);
 
         // Create the Trader, which fails.
+        TraderDTO traderDTO = traderMapper.toDto(trader);
 
 
         restTraderMockMvc.perform(post("/api/traders").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(trader)))
+            .content(TestUtil.convertObjectToJsonBytes(traderDTO)))
             .andExpect(status().isBadRequest());
 
         List<Trader> traderList = traderRepository.findAll();
@@ -274,10 +290,11 @@ public class TraderResourceIT {
             .apiKey(UPDATED_API_KEY)
             .apiSecret(UPDATED_API_SECRET)
             .attributes(UPDATED_ATTRIBUTES);
+        TraderDTO traderDTO = traderMapper.toDto(updatedTrader);
 
         restTraderMockMvc.perform(put("/api/traders").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(updatedTrader)))
+            .content(TestUtil.convertObjectToJsonBytes(traderDTO)))
             .andExpect(status().isOk());
 
         // Validate the Trader in the database
@@ -295,10 +312,13 @@ public class TraderResourceIT {
     public void updateNonExistingTrader() throws Exception {
         int databaseSizeBeforeUpdate = traderRepository.findAll().size();
 
+        // Create the Trader
+        TraderDTO traderDTO = traderMapper.toDto(trader);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTraderMockMvc.perform(put("/api/traders").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(trader)))
+            .content(TestUtil.convertObjectToJsonBytes(traderDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Trader in the database

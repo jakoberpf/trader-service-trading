@@ -33,8 +33,8 @@
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
         <run.addResources>false</run.addResources>
         <!-- These remain empty unless the corresponding profile is active -->
-        <profile.swagger/>
-        <profile.tls/>
+        <profile.swagger />
+        <profile.tls />
 
         <!-- Dependency versions -->
         <jhipster-dependencies.version>3.7.1</jhipster-dependencies.version>
@@ -565,7 +565,7 @@
                                 <arg>/entrypoint.sh</arg>
                             </entrypoint>
                             <ports>
-                                <port>8083</port>
+                                <port>8092</port>
                                 <port>5701/udp</port>
                             </ports>
                             <environment>
@@ -613,7 +613,7 @@
                             <id>enforce-dependencyConvergence</id>
                             <configuration>
                                 <rules>
-                                    <DependencyConvergence/>
+                                    <DependencyConvergence />
                                 </rules>
                                 <fail>false</fail>
                             </configuration>
@@ -625,15 +625,11 @@
                     <configuration>
                         <rules>
                             <requireMavenVersion>
-                                <message>You are running an older version of Maven. JHipster requires at least Maven
-                                    ${maven.version}
-                                </message>
+                                <message>You are running an older version of Maven. JHipster requires at least Maven ${maven.version}</message>
                                 <version>[${maven.version},)</version>
                             </requireMavenVersion>
                             <requireJavaVersion>
-                                <message>You are running an incompatible version of Java. JHipster supports JDK 8 to
-                                    14.
-                                </message>
+                                <message>You are running an incompatible version of Java. JHipster supports JDK 8 to 14.</message>
                                 <version>[1.8,15)</version>
                             </requireJavaVersion>
                         </rules>
@@ -958,7 +954,7 @@
                                                 </goals>
                                             </pluginExecutionFilter>
                                             <action>
-                                                <ignore/>
+                                                <ignore />
                                             </action>
                                         </pluginExecution>
                                     </pluginExecutions>
