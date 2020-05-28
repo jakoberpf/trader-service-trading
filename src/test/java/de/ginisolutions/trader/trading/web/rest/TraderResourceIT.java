@@ -251,7 +251,7 @@ public class TraderResourceIT {
             .andExpect(jsonPath("$.[*].apiSecret").value(hasItem(DEFAULT_API_SECRET)))
             .andExpect(jsonPath("$.[*].attributes").value(hasItem(DEFAULT_ATTRIBUTES)));
     }
-    
+
     @Test
     public void getTrader() throws Exception {
         // Initialize the database

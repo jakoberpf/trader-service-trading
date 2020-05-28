@@ -298,12 +298,11 @@
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
         </dependency>
-        <!-- jhipster-needle-maven-add-dependency -->
-        <!--        <dependency>-->
-        <!--            <groupId>de.ginisolutions.trader.domain</groupId>-->
-        <!--            <artifactId>trader-domain</artifactId>-->
-        <!--            <version>0.0.1-SNAPSHOT</version>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>de.ginisolutions.trader.domain</groupId>
+            <artifactId>trader-domain</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
