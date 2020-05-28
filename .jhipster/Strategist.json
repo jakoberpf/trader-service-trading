@@ -1,0 +1,39 @@
+{
+  "name": "Strategist",
+  "fields": [
+    {
+      "fieldName": "strategy",
+      "fieldType": "Strategy",
+      "fieldValues": "SAMPLE_ENUM"
+    },
+    {
+      "fieldName": "market",
+      "fieldType": "MarketE",
+      "fieldValues": "SAMPLE_ENUM"
+    },
+    {
+      "fieldName": "symbol",
+      "fieldType": "Symbol",
+      "fieldValues": "SAMPLE_SYMBOL"
+    },
+    {
+      "fieldName": "interval",
+      "fieldType": "Interval",
+      "fieldValues": "SAMPLE_SYMBOL"
+    }
+  ],
+  "relationships": [],
+  "changelogDate": "20200528160749",
+  "javadoc": "The Strategist entity.\\n@author A true hipster",
+  "entityTableName": "strategist",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "serviceClass",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "clientRootFolder": "",
+  "applications": ["tradingService"],
+  "microserviceName": "tradingService"
+}

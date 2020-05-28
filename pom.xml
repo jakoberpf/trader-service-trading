@@ -298,11 +298,13 @@
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
         </dependency>
+        <!--Trader Commons / Domain Dependency-->
         <dependency>
             <groupId>de.ginisolutions.trader.domain</groupId>
             <artifactId>trader-domain</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
+        <!--Trader Commons / Domain Dependency-->
     </dependencies>
 
     <build>

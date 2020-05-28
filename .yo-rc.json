@@ -33,5 +33,5 @@
     "otherModules": [],
     "blueprints": []
   },
-  "entities": ["Trader"]
+  "entities": ["Trader", "TraderPackage", "Strategist", "StrategistPackage"]
 }

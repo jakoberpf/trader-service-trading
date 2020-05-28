@@ -1,0 +1,22 @@
+{
+  "name": "TraderPackage",
+  "fields": [
+    {
+      "fieldName": "fieldName",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [],
+  "changelogDate": "20200528160649",
+  "javadoc": "The TraderPackage entity.\\n@author A true hipster",
+  "entityTableName": "trader_package",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "clientRootFolder": "",
+  "applications": ["tradingService"]
+}

@@ -1,5 +1,7 @@
 package de.ginisolutions.trader.trading.service.dto;
 
+import de.ginisolutions.trader.history.domain.enumeration.MARKET;
+import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
 import io.swagger.annotations.ApiModel;
 import javax.validation.constraints.*;
 import java.io.Serializable;
@@ -9,7 +11,7 @@ import java.io.Serializable;
  */
 @ApiModel(description = "The Trader entity.\n@author A true hipster")
 public class TraderDTO implements Serializable {
-    
+
     private String id;
 
     @NotNull
@@ -19,15 +21,26 @@ public class TraderDTO implements Serializable {
     private String owner;
 
     @NotNull
+    private MARKET market;
+
+    @NotNull
+    private SYMBOL symbol;
+
+    @NotNull
     private String apiKey;
 
     @NotNull
     private String apiSecret;
 
     @NotNull
-    private String attributes;
+    private Boolean isLive;
 
-    
+    @NotNull
+    private Boolean isIn;
+
+    @NotNull
+    private Double budget;
+
     public String getId() {
         return id;
     }
@@ -52,6 +65,22 @@ public class TraderDTO implements Serializable {
         this.owner = owner;
     }
 
+    public MARKET getMarket() {
+        return market;
+    }
+
+    public void setMarket(MARKET market) {
+        this.market = market;
+    }
+
+    public SYMBOL getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(SYMBOL symbol) {
+        this.symbol = symbol;
+    }
+
     public String getApiKey() {
         return apiKey;
     }
@@ -68,12 +97,28 @@ public class TraderDTO implements Serializable {
         this.apiSecret = apiSecret;
     }
 
-    public String getAttributes() {
-        return attributes;
+    public Boolean isIsLive() {
+        return isLive;
     }
 
-    public void setAttributes(String attributes) {
-        this.attributes = attributes;
+    public void setIsLive(Boolean isLive) {
+        this.isLive = isLive;
+    }
+
+    public Boolean isIsIn() {
+        return isIn;
+    }
+
+    public void setIsIn(Boolean isIn) {
+        this.isIn = isIn;
+    }
+
+    public Double getBudget() {
+        return budget;
+    }
+
+    public void setBudget(Double budget) {
+        this.budget = budget;
     }
 
     @Override
@@ -93,16 +138,19 @@ public class TraderDTO implements Serializable {
         return 31;
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
         return "TraderDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", owner='" + getOwner() + "'" +
+            ", market='" + getMarket() + "'" +
+            ", symbol='" + getSymbol() + "'" +
             ", apiKey='" + getApiKey() + "'" +
             ", apiSecret='" + getApiSecret() + "'" +
-            ", attributes='" + getAttributes() + "'" +
+            ", isLive='" + isIsLive() + "'" +
+            ", isIn='" + isIsIn() + "'" +
+            ", budget=" + getBudget() +
             "}";
     }
 }

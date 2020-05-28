@@ -1,0 +1,22 @@
+{
+  "name": "StrategistPackage",
+  "fields": [
+    {
+      "fieldName": "fieldName",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [],
+  "changelogDate": "20200528160849",
+  "javadoc": "The StrategistPackage entity.\\n@author A true hipster",
+  "entityTableName": "strategist_package",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "clientRootFolder": "",
+  "applications": ["tradingService"]
+}

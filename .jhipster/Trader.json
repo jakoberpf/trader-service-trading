@@ -12,6 +12,18 @@
       "fieldValidateRules": ["required"]
     },
     {
+      "fieldName": "market",
+      "fieldType": "MarketE",
+      "fieldValues": "SAMPLE_ENUM",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "symbol",
+      "fieldType": "Symbol",
+      "fieldValues": "SAMPLE_SYMBOL",
+      "fieldValidateRules": ["required"]
+    },
+    {
       "fieldName": "apiKey",
       "fieldType": "String",
       "fieldValidateRules": ["required"]
@@ -22,8 +34,18 @@
       "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "attributes",
-      "fieldType": "String",
+      "fieldName": "isLive",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "isIn",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "budget",
+      "fieldType": "Double",
       "fieldValidateRules": ["required"]
     }
   ],
