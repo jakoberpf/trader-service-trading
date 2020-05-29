@@ -19,8 +19,8 @@ public class StrategistPackage implements Serializable {
     @Id
     private String id;
 
-    @Field("field_name")
-    private String fieldName;
+    @Field("dummy")
+    private String dummy;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
@@ -31,17 +31,17 @@ public class StrategistPackage implements Serializable {
         this.id = id;
     }
 
-    public String getFieldName() {
-        return fieldName;
+    public String getDummy() {
+        return dummy;
     }
 
-    public StrategistPackage fieldName(String fieldName) {
-        this.fieldName = fieldName;
+    public StrategistPackage dummy(String dummy) {
+        this.dummy = dummy;
         return this;
     }
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
+    public void setDummy(String dummy) {
+        this.dummy = dummy;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
@@ -66,7 +66,7 @@ public class StrategistPackage implements Serializable {
     public String toString() {
         return "StrategistPackage{" +
             "id=" + getId() +
-            ", fieldName='" + getFieldName() + "'" +
+            ", dummy='" + getDummy() + "'" +
             "}";
     }
 }

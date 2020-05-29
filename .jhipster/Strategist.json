@@ -3,22 +3,22 @@
   "fields": [
     {
       "fieldName": "strategy",
-      "fieldType": "Strategy",
+      "fieldType": "STRATEGY",
       "fieldValues": "SAMPLE_ENUM"
     },
     {
       "fieldName": "market",
-      "fieldType": "MarketE",
+      "fieldType": "MARKET",
       "fieldValues": "SAMPLE_ENUM"
     },
     {
       "fieldName": "symbol",
-      "fieldType": "Symbol",
+      "fieldType": "SYMBOL",
       "fieldValues": "SAMPLE_SYMBOL"
     },
     {
       "fieldName": "interval",
-      "fieldType": "Interval",
+      "fieldType": "INTERVAL",
       "fieldValues": "SAMPLE_SYMBOL"
     }
   ],

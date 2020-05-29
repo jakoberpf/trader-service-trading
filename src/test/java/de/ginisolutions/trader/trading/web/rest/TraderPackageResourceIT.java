@@ -30,8 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser
 public class TraderPackageResourceIT {
 
-    private static final String DEFAULT_FIELD_NAME = "AAAAAAAAAA";
-    private static final String UPDATED_FIELD_NAME = "BBBBBBBBBB";
+    private static final String DEFAULT_DUMMY = "AAAAAAAAAA";
+    private static final String UPDATED_DUMMY = "BBBBBBBBBB";
 
     @Autowired
     private TraderPackageRepository traderPackageRepository;
@@ -49,7 +49,7 @@ public class TraderPackageResourceIT {
      */
     public static TraderPackage createEntity() {
         TraderPackage traderPackage = new TraderPackage()
-            .fieldName(DEFAULT_FIELD_NAME);
+            .dummy(DEFAULT_DUMMY);
         return traderPackage;
     }
     /**
@@ -60,7 +60,7 @@ public class TraderPackageResourceIT {
      */
     public static TraderPackage createUpdatedEntity() {
         TraderPackage traderPackage = new TraderPackage()
-            .fieldName(UPDATED_FIELD_NAME);
+            .dummy(UPDATED_DUMMY);
         return traderPackage;
     }
 
@@ -83,7 +83,7 @@ public class TraderPackageResourceIT {
         List<TraderPackage> traderPackageList = traderPackageRepository.findAll();
         assertThat(traderPackageList).hasSize(databaseSizeBeforeCreate + 1);
         TraderPackage testTraderPackage = traderPackageList.get(traderPackageList.size() - 1);
-        assertThat(testTraderPackage.getFieldName()).isEqualTo(DEFAULT_FIELD_NAME);
+        assertThat(testTraderPackage.getDummy()).isEqualTo(DEFAULT_DUMMY);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class TraderPackageResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(traderPackage.getId())))
-            .andExpect(jsonPath("$.[*].fieldName").value(hasItem(DEFAULT_FIELD_NAME)));
+            .andExpect(jsonPath("$.[*].dummy").value(hasItem(DEFAULT_DUMMY)));
     }
     
     @Test
@@ -128,7 +128,7 @@ public class TraderPackageResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(traderPackage.getId()))
-            .andExpect(jsonPath("$.fieldName").value(DEFAULT_FIELD_NAME));
+            .andExpect(jsonPath("$.dummy").value(DEFAULT_DUMMY));
     }
     @Test
     public void getNonExistingTraderPackage() throws Exception {
@@ -147,7 +147,7 @@ public class TraderPackageResourceIT {
         // Update the traderPackage
         TraderPackage updatedTraderPackage = traderPackageRepository.findById(traderPackage.getId()).get();
         updatedTraderPackage
-            .fieldName(UPDATED_FIELD_NAME);
+            .dummy(UPDATED_DUMMY);
 
         restTraderPackageMockMvc.perform(put("/api/trader-packages").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
@@ -158,7 +158,7 @@ public class TraderPackageResourceIT {
         List<TraderPackage> traderPackageList = traderPackageRepository.findAll();
         assertThat(traderPackageList).hasSize(databaseSizeBeforeUpdate);
         TraderPackage testTraderPackage = traderPackageList.get(traderPackageList.size() - 1);
-        assertThat(testTraderPackage.getFieldName()).isEqualTo(UPDATED_FIELD_NAME);
+        assertThat(testTraderPackage.getDummy()).isEqualTo(UPDATED_DUMMY);
     }
 
     @Test

@@ -30,8 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser
 public class StrategistPackageResourceIT {
 
-    private static final String DEFAULT_FIELD_NAME = "AAAAAAAAAA";
-    private static final String UPDATED_FIELD_NAME = "BBBBBBBBBB";
+    private static final String DEFAULT_DUMMY = "AAAAAAAAAA";
+    private static final String UPDATED_DUMMY = "BBBBBBBBBB";
 
     @Autowired
     private StrategistPackageRepository strategistPackageRepository;
@@ -49,7 +49,7 @@ public class StrategistPackageResourceIT {
      */
     public static StrategistPackage createEntity() {
         StrategistPackage strategistPackage = new StrategistPackage()
-            .fieldName(DEFAULT_FIELD_NAME);
+            .dummy(DEFAULT_DUMMY);
         return strategistPackage;
     }
     /**
@@ -60,7 +60,7 @@ public class StrategistPackageResourceIT {
      */
     public static StrategistPackage createUpdatedEntity() {
         StrategistPackage strategistPackage = new StrategistPackage()
-            .fieldName(UPDATED_FIELD_NAME);
+            .dummy(UPDATED_DUMMY);
         return strategistPackage;
     }
 
@@ -83,7 +83,7 @@ public class StrategistPackageResourceIT {
         List<StrategistPackage> strategistPackageList = strategistPackageRepository.findAll();
         assertThat(strategistPackageList).hasSize(databaseSizeBeforeCreate + 1);
         StrategistPackage testStrategistPackage = strategistPackageList.get(strategistPackageList.size() - 1);
-        assertThat(testStrategistPackage.getFieldName()).isEqualTo(DEFAULT_FIELD_NAME);
+        assertThat(testStrategistPackage.getDummy()).isEqualTo(DEFAULT_DUMMY);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class StrategistPackageResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(strategistPackage.getId())))
-            .andExpect(jsonPath("$.[*].fieldName").value(hasItem(DEFAULT_FIELD_NAME)));
+            .andExpect(jsonPath("$.[*].dummy").value(hasItem(DEFAULT_DUMMY)));
     }
     
     @Test
@@ -128,7 +128,7 @@ public class StrategistPackageResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(strategistPackage.getId()))
-            .andExpect(jsonPath("$.fieldName").value(DEFAULT_FIELD_NAME));
+            .andExpect(jsonPath("$.dummy").value(DEFAULT_DUMMY));
     }
     @Test
     public void getNonExistingStrategistPackage() throws Exception {
@@ -147,7 +147,7 @@ public class StrategistPackageResourceIT {
         // Update the strategistPackage
         StrategistPackage updatedStrategistPackage = strategistPackageRepository.findById(strategistPackage.getId()).get();
         updatedStrategistPackage
-            .fieldName(UPDATED_FIELD_NAME);
+            .dummy(UPDATED_DUMMY);
 
         restStrategistPackageMockMvc.perform(put("/api/strategist-packages").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
@@ -158,7 +158,7 @@ public class StrategistPackageResourceIT {
         List<StrategistPackage> strategistPackageList = strategistPackageRepository.findAll();
         assertThat(strategistPackageList).hasSize(databaseSizeBeforeUpdate);
         StrategistPackage testStrategistPackage = strategistPackageList.get(strategistPackageList.size() - 1);
-        assertThat(testStrategistPackage.getFieldName()).isEqualTo(UPDATED_FIELD_NAME);
+        assertThat(testStrategistPackage.getDummy()).isEqualTo(UPDATED_DUMMY);
     }
 
     @Test

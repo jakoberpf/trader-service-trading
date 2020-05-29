@@ -13,13 +13,13 @@
     },
     {
       "fieldName": "market",
-      "fieldType": "MarketE",
+      "fieldType": "MARKET",
       "fieldValues": "SAMPLE_ENUM",
       "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "symbol",
-      "fieldType": "Symbol",
+      "fieldType": "SYMBOL",
       "fieldValues": "SAMPLE_SYMBOL",
       "fieldValidateRules": ["required"]
     },

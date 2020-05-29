@@ -2,7 +2,7 @@
   "name": "TraderPackage",
   "fields": [
     {
-      "fieldName": "fieldName",
+      "fieldName": "dummy",
       "fieldType": "String"
     }
   ],

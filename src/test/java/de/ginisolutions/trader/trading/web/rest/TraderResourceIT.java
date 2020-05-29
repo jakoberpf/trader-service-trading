@@ -1,7 +1,5 @@
 package de.ginisolutions.trader.trading.web.rest;
 
-import de.ginisolutions.trader.history.domain.enumeration.MARKET;
-import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
 import de.ginisolutions.trader.trading.TradingServiceApp;
 import de.ginisolutions.trader.trading.config.TestSecurityConfiguration;
 import de.ginisolutions.trader.trading.domain.Trader;
@@ -27,6 +25,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import de.ginisolutions.trader.trading.domain.enumeration.MARKET;
+import de.ginisolutions.trader.trading.domain.enumeration.SYMBOL;
 /**
  * Integration tests for the {@link TraderResource} REST controller.
  */
@@ -44,8 +44,8 @@ public class TraderResourceIT {
     private static final MARKET DEFAULT_MARKET = MARKET.SAMPLE_ENUM;
     private static final MARKET UPDATED_MARKET = MARKET.SAMPLE_ENUM;
 
-    private static final SYMBOL DEFAULT_SYMBOL = SYMBOL.SAMPLE_ENUM;
-    private static final SYMBOL UPDATED_SYMBOL = SYMBOL.SAMPLE_ENUM;
+    private static final SYMBOL DEFAULT_SYMBOL = SYMBOL.SAMPLE_SYMBOL;
+    private static final SYMBOL UPDATED_SYMBOL = SYMBOL.SAMPLE_SYMBOL;
 
     private static final String DEFAULT_API_KEY = "AAAAAAAAAA";
     private static final String UPDATED_API_KEY = "BBBBBBBBBB";
@@ -357,7 +357,7 @@ public class TraderResourceIT {
             .andExpect(jsonPath("$.[*].isIn").value(hasItem(DEFAULT_IS_IN.booleanValue())))
             .andExpect(jsonPath("$.[*].budget").value(hasItem(DEFAULT_BUDGET.doubleValue())));
     }
-
+    
     @Test
     public void getTrader() throws Exception {
         // Initialize the database

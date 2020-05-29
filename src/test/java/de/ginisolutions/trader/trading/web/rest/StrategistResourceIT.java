@@ -1,9 +1,5 @@
 package de.ginisolutions.trader.trading.web.rest;
 
-import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
-import de.ginisolutions.trader.history.domain.enumeration.MARKET;
-import de.ginisolutions.trader.history.domain.enumeration.STRATEGY;
-import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
 import de.ginisolutions.trader.trading.TradingServiceApp;
 import de.ginisolutions.trader.trading.config.TestSecurityConfiguration;
 import de.ginisolutions.trader.trading.domain.Strategist;
@@ -29,6 +25,10 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import de.ginisolutions.trader.trading.domain.enumeration.STRATEGY;
+import de.ginisolutions.trader.trading.domain.enumeration.MARKET;
+import de.ginisolutions.trader.trading.domain.enumeration.SYMBOL;
+import de.ginisolutions.trader.trading.domain.enumeration.INTERVAL;
 /**
  * Integration tests for the {@link StrategistResource} REST controller.
  */
@@ -43,11 +43,11 @@ public class StrategistResourceIT {
     private static final MARKET DEFAULT_MARKET = MARKET.SAMPLE_ENUM;
     private static final MARKET UPDATED_MARKET = MARKET.SAMPLE_ENUM;
 
-    private static final SYMBOL DEFAULT_SYMBOL = SYMBOL.SAMPLE_ENUM;
-    private static final SYMBOL UPDATED_SYMBOL = SYMBOL.SAMPLE_ENUM;
+    private static final SYMBOL DEFAULT_SYMBOL = SYMBOL.SAMPLE_SYMBOL;
+    private static final SYMBOL UPDATED_SYMBOL = SYMBOL.SAMPLE_SYMBOL;
 
-    private static final INTERVAL DEFAULT_INTERVAL = INTERVAL.SAMPLE_ENUM;
-    private static final INTERVAL UPDATED_INTERVAL = INTERVAL.SAMPLE_ENUM;
+    private static final INTERVAL DEFAULT_INTERVAL = INTERVAL.SAMPLE_SYMBOL;
+    private static final INTERVAL UPDATED_INTERVAL = INTERVAL.SAMPLE_SYMBOL;
 
     @Autowired
     private StrategistRepository strategistRepository;
@@ -153,7 +153,7 @@ public class StrategistResourceIT {
             .andExpect(jsonPath("$.[*].symbol").value(hasItem(DEFAULT_SYMBOL.toString())))
             .andExpect(jsonPath("$.[*].interval").value(hasItem(DEFAULT_INTERVAL.toString())));
     }
-
+    
     @Test
     public void getStrategist() throws Exception {
         // Initialize the database
