@@ -1,6 +1,5 @@
 package de.ginisolutions.trader.trading.service;
 
-import de.ginisolutions.trader.trading.domain.Strategist;
 import de.ginisolutions.trader.trading.repository.StrategistRepository;
 import de.ginisolutions.trader.trading.service.dto.StrategistDTO;
 import de.ginisolutions.trader.trading.service.mapper.StrategistMapper;

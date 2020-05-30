@@ -2,7 +2,6 @@ package de.ginisolutions.trader.trading.web.rest;
 
 import de.ginisolutions.trader.trading.TradingServiceApp;
 import de.ginisolutions.trader.trading.config.TestSecurityConfiguration;
-import de.ginisolutions.trader.trading.domain.Trader;
 import de.ginisolutions.trader.trading.repository.TraderRepository;
 import de.ginisolutions.trader.trading.service.TraderService;
 import de.ginisolutions.trader.trading.service.dto.TraderDTO;
@@ -357,7 +356,7 @@ public class TraderResourceIT {
             .andExpect(jsonPath("$.[*].isIn").value(hasItem(DEFAULT_IS_IN.booleanValue())))
             .andExpect(jsonPath("$.[*].budget").value(hasItem(DEFAULT_BUDGET.doubleValue())));
     }
-    
+
     @Test
     public void getTrader() throws Exception {
         // Initialize the database
