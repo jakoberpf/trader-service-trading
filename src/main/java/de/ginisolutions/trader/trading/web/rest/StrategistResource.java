@@ -26,7 +26,7 @@ public class StrategistResource {
 
     private final Logger log = LoggerFactory.getLogger(StrategistResource.class);
 
-    private static final String ENTITY_NAME = "tradingServiceStrategist";
+    private static final String ENTITY_NAME = "traderServiceTradingStrategist";
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;

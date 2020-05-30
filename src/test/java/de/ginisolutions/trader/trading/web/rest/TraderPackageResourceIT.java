@@ -1,6 +1,6 @@
 package de.ginisolutions.trader.trading.web.rest;
 
-import de.ginisolutions.trader.trading.TradingServiceApp;
+import de.ginisolutions.trader.trading.TraderServiceTradingApp;
 import de.ginisolutions.trader.trading.config.TestSecurityConfiguration;
 import de.ginisolutions.trader.trading.domain.TraderPackage;
 import de.ginisolutions.trader.trading.repository.TraderPackageRepository;
@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Integration tests for the {@link TraderPackageResource} REST controller.
  */
-@SpringBootTest(classes = { TradingServiceApp.class, TestSecurityConfiguration.class })
+@SpringBootTest(classes = { TraderServiceTradingApp.class, TestSecurityConfiguration.class })
 @AutoConfigureMockMvc
 @WithMockUser
 public class TraderPackageResourceIT {

@@ -27,7 +27,7 @@ public class TraderResource {
 
     private final Logger log = LoggerFactory.getLogger(TraderResource.class);
 
-    private static final String ENTITY_NAME = "tradingServiceTrader";
+    private static final String ENTITY_NAME = "traderServiceTradingTrader";
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;

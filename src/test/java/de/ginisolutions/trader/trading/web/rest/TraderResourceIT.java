@@ -1,6 +1,6 @@
 package de.ginisolutions.trader.trading.web.rest;
 
-import de.ginisolutions.trader.trading.TradingServiceApp;
+import de.ginisolutions.trader.trading.TraderServiceTradingApp;
 import de.ginisolutions.trader.trading.config.TestSecurityConfiguration;
 import de.ginisolutions.trader.trading.domain.Trader;
 import de.ginisolutions.trader.trading.repository.TraderRepository;
@@ -30,7 +30,7 @@ import de.ginisolutions.trader.trading.domain.enumeration.SYMBOL;
 /**
  * Integration tests for the {@link TraderResource} REST controller.
  */
-@SpringBootTest(classes = { TradingServiceApp.class, TestSecurityConfiguration.class })
+@SpringBootTest(classes = { TraderServiceTradingApp.class, TestSecurityConfiguration.class })
 @AutoConfigureMockMvc
 @WithMockUser
 public class TraderResourceIT {
