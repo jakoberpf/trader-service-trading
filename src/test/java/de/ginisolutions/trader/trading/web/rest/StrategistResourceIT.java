@@ -2,6 +2,7 @@ package de.ginisolutions.trader.trading.web.rest;
 
 import de.ginisolutions.trader.trading.TradingServiceApp;
 import de.ginisolutions.trader.trading.config.TestSecurityConfiguration;
+import de.ginisolutions.trader.trading.domain.Strategist;
 import de.ginisolutions.trader.trading.repository.StrategistRepository;
 import de.ginisolutions.trader.trading.service.StrategistService;
 import de.ginisolutions.trader.trading.service.dto.StrategistDTO;
@@ -152,7 +153,7 @@ public class StrategistResourceIT {
             .andExpect(jsonPath("$.[*].symbol").value(hasItem(DEFAULT_SYMBOL.toString())))
             .andExpect(jsonPath("$.[*].interval").value(hasItem(DEFAULT_INTERVAL.toString())));
     }
-
+    
     @Test
     public void getStrategist() throws Exception {
         // Initialize the database
