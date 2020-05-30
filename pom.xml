@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.ginisolutions.trader.trading</groupId>
-    <artifactId>trading-service</artifactId>
+    <artifactId>trader-service-trading</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Trading Service</name>
+    <name>Trader Service Trading</name>
 
     <repositories>
         <!-- jhipster-needle-maven-repository -->
@@ -557,7 +557,7 @@
                             <image>adoptopenjdk:11-jre-hotspot</image>
                         </from>
                         <to>
-                            <image>tradingservice:latest</image>
+                            <image>traderservicetrading:latest</image>
                         </to>
                         <container>
                             <entrypoint>
@@ -749,7 +749,7 @@
                                 <skipValidateSpec>false</skipValidateSpec>
                                 <configOptions>
                                     <delegatePattern>true</delegatePattern>
-                                    <title>trading-service</title>
+                                    <title>trader-service-trading</title>
                                 </configOptions>
                             </configuration>
                         </execution>

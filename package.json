@@ -1,7 +1,7 @@
 {
-  "name": "trading-service",
+  "name": "trader-service-trading",
   "version": "0.0.0",
-  "description": "Description for tradingService",
+  "description": "Description for TraderServiceTrading",
   "private": true,
   "license": "UNLICENSED",
   "cacheDirectories": [

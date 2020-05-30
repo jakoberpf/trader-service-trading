@@ -17,12 +17,12 @@ eureka:
   client:
     enabled: false
   instance:
-    appname: tradingService
-    instanceId: tradingService:${spring.application.instance-id:${random.value}}
+    appname: TraderServiceTrading
+    instanceId: TraderServiceTrading:${spring.application.instance-id:${random.value}}
 
 spring:
   application:
-    name: tradingService
+    name: TraderServiceTrading
   jackson:
     serialization:
       write-durations-as-timestamps: false
@@ -30,7 +30,7 @@ spring:
     mongodb:
       host: localhost
       port: 0
-      database: tradingService
+      database: TraderServiceTrading
   mail:
     host: localhost
   main:
@@ -42,13 +42,13 @@ spring:
       enabled: false
   task:
     execution:
-      thread-name-prefix: trading-service-task-
+      thread-name-prefix: trader-service-trading-task-
       pool:
         core-size: 1
         max-size: 50
         queue-capacity: 10000
     scheduling:
-      thread-name-prefix: trading-service-scheduling-
+      thread-name-prefix: trader-service-trading-scheduling-
       pool:
         size: 1
   thymeleaf:
@@ -73,7 +73,7 @@ server:
 
 jhipster:
   clientApp:
-    name: 'tradingServiceApp'
+    name: 'traderServiceTradingApp'
   logging:
     # To test json console appender
     use-json-format: false

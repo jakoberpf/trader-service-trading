@@ -1,4 +1,4 @@
-# tradingService
+# TraderServiceTrading
 
 This application was generated using JHipster 6.9.0, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v6.9.0](https://www.jhipster.tech/documentation-archive/v6.9.0).
 
@@ -32,7 +32,7 @@ Refer to [Doing API-First development][] for more details.
 
 ### Packaging as jar
 
-To build the final jar and optimize the tradingService application for production, run:
+To build the final jar and optimize the TraderServiceTrading application for production, run:
 
     ./mvnw -Pprod clean verify
 

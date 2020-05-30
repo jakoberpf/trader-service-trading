@@ -1,6 +1,6 @@
 package de.ginisolutions.trader.trading.service;
 
-import de.ginisolutions.trader.trading.TradingServiceApp;
+import de.ginisolutions.trader.trading.TraderServiceTradingApp;
 import de.ginisolutions.trader.trading.config.Constants;
 import de.ginisolutions.trader.trading.config.TestSecurityConfiguration;
 import de.ginisolutions.trader.trading.domain.User;
@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration tests for {@link UserService}.
  */
-@SpringBootTest(classes = {TradingServiceApp.class, TestSecurityConfiguration.class})
+@SpringBootTest(classes = {TraderServiceTradingApp.class, TestSecurityConfiguration.class})
 public class UserServiceIT {
 
     private static final String DEFAULT_LOGIN = "johndoe";

@@ -1,6 +1,6 @@
 package de.ginisolutions.trader.trading.repository;
 
-import de.ginisolutions.trader.trading.TradingServiceApp;
+import de.ginisolutions.trader.trading.TraderServiceTradingApp;
 
 import de.ginisolutions.trader.trading.config.Constants;
 import de.ginisolutions.trader.trading.config.TestSecurityConfiguration;
@@ -28,7 +28,7 @@ import static de.ginisolutions.trader.trading.repository.CustomAuditEventReposit
 /**
  * Integration tests for {@link CustomAuditEventRepository}.
  */
-@SpringBootTest(classes = {TradingServiceApp.class, TestSecurityConfiguration.class})
+@SpringBootTest(classes = {TraderServiceTradingApp.class, TestSecurityConfiguration.class})
 public class CustomAuditEventRepositoryIT {
 
     @Autowired

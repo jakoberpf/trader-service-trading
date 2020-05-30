@@ -1,6 +1,6 @@
 package de.ginisolutions.trader.trading.web.rest.errors;
 
-import de.ginisolutions.trader.trading.TradingServiceApp;
+import de.ginisolutions.trader.trading.TraderServiceTradingApp;
 import de.ginisolutions.trader.trading.config.TestSecurityConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WithMockUser
 @AutoConfigureMockMvc
-@SpringBootTest(classes = {TradingServiceApp.class, TestSecurityConfiguration.class})
+@SpringBootTest(classes = {TraderServiceTradingApp.class, TestSecurityConfiguration.class})
 public class ExceptionTranslatorIT {
 
     @Autowired

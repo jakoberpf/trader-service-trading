@@ -1,6 +1,6 @@
 package de.ginisolutions.trader.trading.web.rest;
 
-import de.ginisolutions.trader.trading.TradingServiceApp;
+import de.ginisolutions.trader.trading.TraderServiceTradingApp;
 import de.ginisolutions.trader.trading.config.TestSecurityConfiguration;
 import de.ginisolutions.trader.trading.domain.Authority;
 import de.ginisolutions.trader.trading.domain.User;
@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @AutoConfigureMockMvc
 @WithMockUser(authorities = AuthoritiesConstants.ADMIN)
-@SpringBootTest(classes = {TradingServiceApp.class, TestSecurityConfiguration.class})
+@SpringBootTest(classes = {TraderServiceTradingApp.class, TestSecurityConfiguration.class})
 public class UserResourceIT {
 
     private static final String DEFAULT_LOGIN = "johndoe";
