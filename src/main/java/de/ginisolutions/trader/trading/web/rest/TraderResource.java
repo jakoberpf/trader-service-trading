@@ -10,6 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -32,9 +36,10 @@ public class TraderResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
-    private final TraderService traderService;
+    private final TraderService traderService; // TODO user Platform to control Traders
 
     public TraderResource(TraderService traderService) {
+        log.info("Constructing TraderResource");
         this.traderService = traderService;
     }
 
@@ -51,7 +56,7 @@ public class TraderResource {
         if (traderDTO.getId() != null) {
             throw new BadRequestAlertException("A new trader cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        TraderDTO result = traderService.save(traderDTO);
+        TraderDTO result = traderService.create(traderDTO);
         return ResponseEntity.created(new URI("/api/traders/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId()))
             .body(result);
@@ -72,7 +77,7 @@ public class TraderResource {
         if (traderDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        TraderDTO result = traderService.save(traderDTO);
+        TraderDTO result = traderService.update(traderDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, traderDTO.getId()))
             .body(result);
@@ -114,5 +119,18 @@ public class TraderResource {
 
         traderService.delete(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id)).build();
+    }
+
+    /**
+     * @return an optional of the username of the currently authenticated user/principal
+     */
+    private static Optional<String> getUsernameFromAuthentication() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Optional<String> username = Optional.empty();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            username = Optional.of(userDetails.getUsername());
+        }
+        return username;
     }
 }

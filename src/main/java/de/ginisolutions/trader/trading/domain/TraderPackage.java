@@ -1,72 +1,55 @@
 package de.ginisolutions.trader.trading.domain;
 
-import io.swagger.annotations.ApiModel;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import de.ginisolutions.trader.common.market.AccountImpl;
+import de.ginisolutions.trader.common.messaging.BaseListener;
+import de.ginisolutions.trader.trading.messaging.SignalMessage;
+import net.engio.mbassy.listener.Handler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
+import javax.validation.constraints.NotNull;
+
+import static de.ginisolutions.trader.trading.domain.enumeration.SIGNAL.ENTER;
+import static de.ginisolutions.trader.trading.domain.enumeration.SIGNAL.EXIT;
 
 /**
- * The TraderPackage entity.\n@author A true hipster
+ * The TraderPackage entity contains the Trader entity and some simple business logic.
+ * Is is instantiated for every Trader in the database at application startup and handles
+ * the business logic of entering/exciting assets.
  */
-@ApiModel(description = "The TraderPackage entity.\n@author A true hipster")
-@Document(collection = "trader_package")
-public class TraderPackage implements Serializable {
+public class TraderPackage implements BaseListener {
 
-    private static final long serialVersionUID = 1L;
+    private static final Logger log = LoggerFactory.getLogger(TraderPackage.class);
 
-    @Id
-    private String id;
+    @NotNull
+    private final Trader trader;
 
-    @Field("dummy")
-    private String dummy;
+    @NotNull
+    private final AccountImpl accountImpl;
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here
-    public String getId() {
-        return id;
+    public TraderPackage(@NotNull Trader trader, @NotNull AccountImpl accountImpl) {
+        this.trader = trader;
+        this.accountImpl = accountImpl;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getDummy() {
-        return dummy;
-    }
-
-    public TraderPackage dummy(String dummy) {
-        this.dummy = dummy;
-        return this;
-    }
-
-    public void setDummy(String dummy) {
-        this.dummy = dummy;
-    }
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    @Handler
+    private void handleSignal(@NotNull SignalMessage signalMessage) {
+        log.warn("Got SIGNAL");
+        if (signalMessage.getSignal().equals(ENTER)) {
+            log.warn("Got ENTER");
         }
-        if (!(o instanceof TraderPackage)) {
-            return false;
+        if (signalMessage.getSignal().equals(EXIT)) {
+            log.warn("Got EXIT");
         }
-        return id != null && id.equals(((TraderPackage) o).id);
+        // TODO enter market with budget
+        // TODO save action to history
     }
 
-    @Override
-    public int hashCode() {
-        return 31;
+    public Trader getTrader() {
+        return trader;
     }
 
-    // prettier-ignore
-    @Override
-    public String toString() {
-        return "TraderPackage{" +
-            "id=" + getId() +
-            ", dummy='" + getDummy() + "'" +
-            "}";
+    public String getTraderOwner() {
+        return trader.getOwner();
     }
 }

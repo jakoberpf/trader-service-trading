@@ -1,17 +1,18 @@
 package de.ginisolutions.trader.trading.service.dto;
 
+import de.ginisolutions.trader.history.domain.enumeration.MARKET;
+import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
 import io.swagger.annotations.ApiModel;
 import javax.validation.constraints.*;
 import java.io.Serializable;
-import de.ginisolutions.trader.trading.domain.enumeration.MARKET;
-import de.ginisolutions.trader.trading.domain.enumeration.SYMBOL;
+
 
 /**
  * A DTO for the {@link de.ginisolutions.trader.trading.domain.Trader} entity.
  */
 @ApiModel(description = "The Trader entity.\n@author A true hipster")
 public class TraderDTO implements Serializable {
-    
+
     private String id;
 
     @NotNull
@@ -41,7 +42,7 @@ public class TraderDTO implements Serializable {
     @NotNull
     private Double budget;
 
-    
+
     public String getId() {
         return id;
     }

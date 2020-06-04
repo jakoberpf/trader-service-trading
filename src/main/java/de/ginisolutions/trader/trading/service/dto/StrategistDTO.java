@@ -1,18 +1,18 @@
 package de.ginisolutions.trader.trading.service.dto;
 
+import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
+import de.ginisolutions.trader.history.domain.enumeration.MARKET;
+import de.ginisolutions.trader.trading.domain.enumeration.STRATEGY;
+import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
 import io.swagger.annotations.ApiModel;
 import java.io.Serializable;
-import de.ginisolutions.trader.trading.domain.enumeration.STRATEGY;
-import de.ginisolutions.trader.trading.domain.enumeration.MARKET;
-import de.ginisolutions.trader.trading.domain.enumeration.SYMBOL;
-import de.ginisolutions.trader.trading.domain.enumeration.INTERVAL;
 
 /**
  * A DTO for the {@link de.ginisolutions.trader.trading.domain.Strategist} entity.
  */
 @ApiModel(description = "The Strategist entity.\n@author A true hipster")
 public class StrategistDTO implements Serializable {
-    
+
     private String id;
 
     private STRATEGY strategy;
@@ -23,7 +23,7 @@ public class StrategistDTO implements Serializable {
 
     private INTERVAL interval;
 
-    
+
     public String getId() {
         return id;
     }
