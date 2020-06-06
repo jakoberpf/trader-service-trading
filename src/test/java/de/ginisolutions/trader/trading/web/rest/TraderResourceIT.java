@@ -1,10 +1,14 @@
 package de.ginisolutions.trader.trading.web.rest;
 
+import de.ginisolutions.trader.common.strategy.parameter.ParameterMovingMomentum;
+import de.ginisolutions.trader.common.strategy.parameter.StrategyParameter;
+import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
 import de.ginisolutions.trader.history.domain.enumeration.MARKET;
 import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
 import de.ginisolutions.trader.trading.TraderServiceTradingApp;
 import de.ginisolutions.trader.trading.config.TestSecurityConfiguration;
 import de.ginisolutions.trader.trading.domain.Trader;
+import de.ginisolutions.trader.trading.domain.enumeration.STRATEGY;
 import de.ginisolutions.trader.trading.repository.TraderRepository;
 import de.ginisolutions.trader.trading.service.TraderService;
 import de.ginisolutions.trader.trading.service.dto.TraderDTO;
@@ -41,11 +45,17 @@ public class TraderResourceIT {
     private static final String DEFAULT_OWNER = "AAAAAAAAAA";
     private static final String UPDATED_OWNER = "BBBBBBBBBB";
 
-    private static final MARKET DEFAULT_MARKET = MARKET.SAMPLE_ENUM;
-    private static final MARKET UPDATED_MARKET = MARKET.SAMPLE_ENUM;
+    private static final MARKET DEFAULT_MARKET = MARKET.SAMPLE_ENUM; // TODO user real enums
+    private static final MARKET UPDATED_MARKET = MARKET.SAMPLE_ENUM; // TODO user real enums
 
-    private static final SYMBOL DEFAULT_SYMBOL = SYMBOL.SAMPLE_SYMBOL;
-    private static final SYMBOL UPDATED_SYMBOL = SYMBOL.SAMPLE_SYMBOL;
+    private static final SYMBOL DEFAULT_SYMBOL = SYMBOL.SAMPLE_SYMBOL; // TODO user real enums
+    private static final SYMBOL UPDATED_SYMBOL = SYMBOL.SAMPLE_SYMBOL; // TODO user real enums
+
+    private static final INTERVAL DEFAULT_INTERVAL = INTERVAL.SAMPLE_SYMBOL; // TODO user real enums
+    private static final INTERVAL UPDATED_INTERVAL = INTERVAL.SAMPLE_SYMBOL; // TODO user real enums
+
+    private static final STRATEGY DEFAULT_STRATEGY = STRATEGY.SAMPLE_ENUM; // TODO user real enums
+    private static final STRATEGY UPDATED_STRATEGY = STRATEGY.SAMPLE_ENUM; // TODO user real enums
 
     private static final String DEFAULT_API_KEY = "AAAAAAAAAA";
     private static final String UPDATED_API_KEY = "BBBBBBBBBB";
@@ -85,6 +95,8 @@ public class TraderResourceIT {
             .owner(DEFAULT_OWNER)
             .market(DEFAULT_MARKET)
             .symbol(DEFAULT_SYMBOL)
+            .interval(DEFAULT_INTERVAL)
+            .strategy(DEFAULT_STRATEGY)
             .apiKey(DEFAULT_API_KEY)
             .apiSecret(DEFAULT_API_SECRET)
             .isLive(DEFAULT_IS_LIVE)
@@ -104,6 +116,8 @@ public class TraderResourceIT {
             .owner(UPDATED_OWNER)
             .market(UPDATED_MARKET)
             .symbol(UPDATED_SYMBOL)
+            .interval(UPDATED_INTERVAL)
+            .strategy(UPDATED_STRATEGY)
             .apiKey(UPDATED_API_KEY)
             .apiSecret(UPDATED_API_SECRET)
             .isLive(UPDATED_IS_LIVE)
@@ -136,6 +150,8 @@ public class TraderResourceIT {
         assertThat(testTrader.getOwner()).isEqualTo(DEFAULT_OWNER);
         assertThat(testTrader.getMarket()).isEqualTo(DEFAULT_MARKET);
         assertThat(testTrader.getSymbol()).isEqualTo(DEFAULT_SYMBOL);
+        assertThat(testTrader.getInterval()).isEqualTo(DEFAULT_INTERVAL);
+        assertThat(testTrader.getStrategy()).isEqualTo(DEFAULT_STRATEGY);
         assertThat(testTrader.getApiKey()).isEqualTo(DEFAULT_API_KEY);
         assertThat(testTrader.getApiSecret()).isEqualTo(DEFAULT_API_SECRET);
         assertThat(testTrader.isIsLive()).isEqualTo(DEFAULT_IS_LIVE);
@@ -348,10 +364,12 @@ public class TraderResourceIT {
             .andExpect(jsonPath("$.[*].owner").value(hasItem(DEFAULT_OWNER)))
             .andExpect(jsonPath("$.[*].market").value(hasItem(DEFAULT_MARKET.toString())))
             .andExpect(jsonPath("$.[*].symbol").value(hasItem(DEFAULT_SYMBOL.toString())))
+            .andExpect(jsonPath("$.[*].interval").value(hasItem(DEFAULT_INTERVAL.toString())))
+            .andExpect(jsonPath("$.[*].strategy").value(hasItem(DEFAULT_STRATEGY.toString())))
             .andExpect(jsonPath("$.[*].apiKey").value(hasItem(DEFAULT_API_KEY)))
             .andExpect(jsonPath("$.[*].apiSecret").value(hasItem(DEFAULT_API_SECRET)))
-            .andExpect(jsonPath("$.[*].isLive").value(hasItem(DEFAULT_IS_LIVE.booleanValue())))
-            .andExpect(jsonPath("$.[*].isIn").value(hasItem(DEFAULT_IS_IN.booleanValue())))
+            .andExpect(jsonPath("$.[*].isLive").value(hasItem(DEFAULT_IS_LIVE.booleanValue()))) // TODO test that not published/exists
+            .andExpect(jsonPath("$.[*].isIn").value(hasItem(DEFAULT_IS_IN.booleanValue()))) // TODO test that not published/exists
             .andExpect(jsonPath("$.[*].budget").value(hasItem(DEFAULT_BUDGET.doubleValue())));
     }
 
@@ -369,8 +387,10 @@ public class TraderResourceIT {
             .andExpect(jsonPath("$.owner").value(DEFAULT_OWNER))
             .andExpect(jsonPath("$.market").value(DEFAULT_MARKET.toString()))
             .andExpect(jsonPath("$.symbol").value(DEFAULT_SYMBOL.toString()))
-            .andExpect(jsonPath("$.apiKey").value(DEFAULT_API_KEY))
-            .andExpect(jsonPath("$.apiSecret").value(DEFAULT_API_SECRET))
+            .andExpect(jsonPath("$.interval").value(DEFAULT_INTERVAL.toString()))
+            .andExpect(jsonPath("$.strategy").value(DEFAULT_STRATEGY.toString()))
+            .andExpect(jsonPath("$.apiKey").value(DEFAULT_API_KEY)) // TODO test that not published/exists
+            .andExpect(jsonPath("$.apiSecret").value(DEFAULT_API_SECRET)) // TODO test that not published/exists
             .andExpect(jsonPath("$.isLive").value(DEFAULT_IS_LIVE.booleanValue()))
             .andExpect(jsonPath("$.isIn").value(DEFAULT_IS_IN.booleanValue()))
             .andExpect(jsonPath("$.budget").value(DEFAULT_BUDGET.doubleValue()));
@@ -396,6 +416,8 @@ public class TraderResourceIT {
             .owner(UPDATED_OWNER)
             .market(UPDATED_MARKET)
             .symbol(UPDATED_SYMBOL)
+            .interval(UPDATED_INTERVAL)
+            .strategy(UPDATED_STRATEGY)
             .apiKey(UPDATED_API_KEY)
             .apiSecret(UPDATED_API_SECRET)
             .isLive(UPDATED_IS_LIVE)
@@ -416,6 +438,8 @@ public class TraderResourceIT {
         assertThat(testTrader.getOwner()).isEqualTo(UPDATED_OWNER);
         assertThat(testTrader.getMarket()).isEqualTo(UPDATED_MARKET);
         assertThat(testTrader.getSymbol()).isEqualTo(UPDATED_SYMBOL);
+        assertThat(testTrader.getInterval()).isEqualTo(UPDATED_INTERVAL);
+        assertThat(testTrader.getStrategy()).isEqualTo(UPDATED_STRATEGY);
         assertThat(testTrader.getApiKey()).isEqualTo(UPDATED_API_KEY);
         assertThat(testTrader.getApiSecret()).isEqualTo(UPDATED_API_SECRET);
         assertThat(testTrader.isIsLive()).isEqualTo(UPDATED_IS_LIVE);

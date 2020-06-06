@@ -9,7 +9,7 @@ public class SignalPublisher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SignalPublisher.class);
 
-    private final MBassador<SignalMessage> bus;
+    private final MBassador<Signal> bus;
 
     /**
      * TODO
@@ -25,29 +25,39 @@ public class SignalPublisher {
      * @param listener defines the listener to subscribe to the event bus
      */
     public void subscribe(SignalListener listener) {
+        LOGGER.info("Subscribing new listener: " + listener);
         this.bus.subscribe(listener);
     }
 
     /**
-     * @param signalMessage
+     * This method unsubscribes the provided listener from the event bus
+     * @param listener defines the listener to unsubscribe from the event bus
+     */
+    public void unsubscribe(SignalListener listener) {
+        LOGGER.info("Unsubscribing listener: " + listener);
+        this.bus.unsubscribe(listener);
+    }
+
+    /**
+     * @param signal
      * @param aync
      * @return
      */
-    public boolean publishSignal(SignalMessage signalMessage, boolean aync) {
+    public boolean publishSignal(Signal signal, boolean aync) {
         if (aync) {
-            this.bus.post(signalMessage).asynchronously();
+            this.bus.post(signal).asynchronously();
         } else {
-            this.publishSignal(signalMessage);
+            this.publishSignal(signal);
         }
         return true;
     }
 
     /**
-     * @param signalMessage
+     * @param signal
      * @return
      */
-    public boolean publishSignal(SignalMessage signalMessage) {
-        this.bus.post(signalMessage).now();
+    public boolean publishSignal(Signal signal) {
+        this.bus.post(signal).now();
         return true;
     }
 }

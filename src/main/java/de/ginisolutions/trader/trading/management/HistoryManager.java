@@ -2,6 +2,7 @@ package de.ginisolutions.trader.trading.management;
 
 import de.ginisolutions.trader.common.market.CrawlerImpl;
 import de.ginisolutions.trader.common.market.CrawlerImplFactory;
+import de.ginisolutions.trader.common.messaging.BaseListener;
 import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
 import de.ginisolutions.trader.history.domain.enumeration.MARKET;
 import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
@@ -61,7 +62,7 @@ public class HistoryManager {
      * @param interval defines the interval of the crawler
      * @param listener defines the tick listener to be subscribe
      */
-    public void subscribe2crawler(MARKET market, SYMBOL symbol, INTERVAL interval, TickListener listener) {
+    public void subscribe2crawler(MARKET market, SYMBOL symbol, INTERVAL interval, BaseListener listener) {
         final String key = market.toString() + symbol.toString() + interval.toString();
         final CrawlerImpl crawler = this.crawlerMap.get(key);
         if (crawler != null) {

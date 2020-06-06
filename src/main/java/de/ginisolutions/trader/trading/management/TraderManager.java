@@ -27,12 +27,15 @@ public class TraderManager {
 
     private final TraderRepository traderRepository;
 
+    private final StrategistManager strategistManager;
+
     private final List<TraderPackage> traderPackageList;
 
-    public TraderManager(ApplicationEventPublisher eventPublisher, TraderRepository traderRepository) {
+    public TraderManager(ApplicationEventPublisher eventPublisher, TraderRepository traderRepository, StrategistManager strategistManager) {
         log.info("Constructing TraderManager");
         this.eventPublisher = eventPublisher;
         this.traderRepository = traderRepository;
+        this.strategistManager = strategistManager;
         this.traderPackageList = new ArrayList<>();
     }
 
@@ -43,10 +46,15 @@ public class TraderManager {
      */
     @EventListener()
     public void init(TradingInit init) {
-        log.info("Initializing TradingService");
+        log.info("Initializing TraderManager");
         if (init.isHistoryManager() && init.isStrategistManager()) {
-            traderRepository.findAll().forEach(trader -> this.traderPackageList.add(new TraderPackage(trader,
-                AccountImplFactory.buildAccount(trader.getMarket(), trader.getApiKey(), trader.getApiSecret()))));
+            traderRepository.findAll().forEach(trader -> {
+                final TraderPackage newTraderPackage = new TraderPackage(trader,
+                    AccountImplFactory.buildAccount(trader.getMarket(), trader.getApiKey(), trader.getApiSecret()));
+                this.strategistManager.subscribe2strategist(trader.getMarket(), trader.getSymbol(), trader.getInterval(), trader.getStrategy(), newTraderPackage);
+                this.traderPackageList.add(newTraderPackage);
+            });
+            log.info("Initialisation of TraderManager complete");
             init.setTraderManager();
             this.eventPublisher.publishEvent(init);
         }

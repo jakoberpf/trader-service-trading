@@ -1,8 +1,13 @@
 package de.ginisolutions.trader.trading.service.dto;
 
+import de.ginisolutions.trader.common.strategy.parameter.StrategyParameter;
+import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
 import de.ginisolutions.trader.history.domain.enumeration.MARKET;
 import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
+import de.ginisolutions.trader.trading.domain.enumeration.STRATEGY;
 import io.swagger.annotations.ApiModel;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import javax.validation.constraints.*;
 import java.io.Serializable;
 
@@ -28,10 +33,16 @@ public class TraderDTO implements Serializable {
     private SYMBOL symbol;
 
     @NotNull
-    private String apiKey;
+    private INTERVAL interval;
 
     @NotNull
-    private String apiSecret;
+    private STRATEGY strategy;
+
+    @NotNull
+    private String apiKey; // TODO receive, but dont publish
+
+    @NotNull
+    private String apiSecret; // TODO receive, but dont publish
 
     @NotNull
     private Boolean isLive;
@@ -81,6 +92,22 @@ public class TraderDTO implements Serializable {
 
     public void setSymbol(SYMBOL symbol) {
         this.symbol = symbol;
+    }
+
+    public INTERVAL getInterval() {
+        return interval;
+    }
+
+    public void setInterval(INTERVAL interval) {
+        this.interval = interval;
+    }
+
+    public STRATEGY getStrategy() {
+        return strategy;
+    }
+
+    public void setStrategy(STRATEGY strategy) {
+        this.strategy = strategy;
     }
 
     public String getApiKey() {

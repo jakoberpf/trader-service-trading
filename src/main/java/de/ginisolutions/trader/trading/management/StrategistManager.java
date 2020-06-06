@@ -1,6 +1,10 @@
 package de.ginisolutions.trader.trading.management;
 
+import de.ginisolutions.trader.common.messaging.BaseListener;
 import de.ginisolutions.trader.common.messaging.TickListener;
+import de.ginisolutions.trader.common.strategy.parameter.ParameterCommodityChannelIndex;
+import de.ginisolutions.trader.common.strategy.parameter.ParameterMovingMomentum;
+import de.ginisolutions.trader.common.strategy.parameter.ParameterRelativeStrengthIndex;
 import de.ginisolutions.trader.common.strategy.parameter.StrategyParameter;
 import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
 import de.ginisolutions.trader.history.domain.enumeration.MARKET;
@@ -31,6 +35,8 @@ public class StrategistManager {
 
     private final StrategistRepository strategistRepository;
 
+    private final HistoryManager historyManager;
+
     private final Map<String, List<StrategistPackage>> strategistMap;
 
     /**
@@ -38,10 +44,11 @@ public class StrategistManager {
      *
      * @param eventPublisher the eventPublisher, used for publishing an "Initialisation finished event"
      */
-    public StrategistManager(ApplicationEventPublisher eventPublisher, StrategistRepository strategistRepository) {
+    public StrategistManager(ApplicationEventPublisher eventPublisher, StrategistRepository strategistRepository, HistoryManager historyManager) {
         log.info("Constructing StrategistManager");
         this.eventPublisher = eventPublisher;
         this.strategistRepository = strategistRepository;
+        this.historyManager = historyManager;
         this.strategistMap = new HashMap<>();
         // TODO add Feign Client for quicker data fetch from database
     }
@@ -54,8 +61,33 @@ public class StrategistManager {
     @EventListener
     public void init(TradingInit init) {
         log.info("Initializing StrategistManager");
+        final HistoryProvider historyProvider = new HistoryProvider();
         if (init.isHistoryManager()) {
-            // TODO get all strategist from database and create a package for each
+            this.strategistRepository.findAll().forEach(strategistFromRepo -> {
+                final String key = strategistFromRepo.getMarket().toString() + strategistFromRepo.getSymbol().toString() + strategistFromRepo.getInterval().toString() + strategistFromRepo.getStrategy().toString();
+                final List<StrategistPackage> strategistList = this.strategistMap.get(key);
+                if (strategistList != null) {
+                    if (strategistList.stream()
+                        .anyMatch(strategist -> strategist.getStrategist().getParameters().equals(strategistFromRepo.getParameters()))) {
+                        // parameter are the same -> duplicates in the repository
+                        log.warn("Found duplicates in the repository, all the later ones are neglected and deleted");
+                        this.strategistRepository.delete(strategistFromRepo);
+                    }
+                    // create a new strategist package and add it to the list
+                    else {
+                        final StrategistPackage newStrategistPackage = new StrategistPackage(strategistFromRepo, historyProvider);
+                        this.historyManager.subscribe2crawler(strategistFromRepo.getMarket(), strategistFromRepo.getSymbol(), strategistFromRepo.getInterval(), newStrategistPackage);
+                        strategistList.add(newStrategistPackage);
+                    }
+                }
+                // create a new strategist package and add it to the list
+                else {
+                    final StrategistPackage newStrategistPackage = new StrategistPackage(strategistFromRepo, historyProvider);
+                    this.strategistMap.put(key, List.of(newStrategistPackage));
+                }
+            });
+            // Initialisation is complete
+            log.info("Initialisation of StrategistManager complete");
             init.setHistoryManager();
             this.eventPublisher.publishEvent(init);
         }
@@ -64,7 +96,7 @@ public class StrategistManager {
     /**
      * Persist all strategists
      */
-//    @Scheduled(fixedDelay = 1000) // TODO user env variable
+    @Scheduled(fixedDelay = 1000) // TODO user env variable
     private void persist() {
         this.strategistMap.forEach((s, strategistPackages) -> {
             strategistPackages.forEach(strategistPackage -> {
@@ -81,8 +113,28 @@ public class StrategistManager {
      * @param interval defines the interval of the crawler
      * @param listener defines the tick listener to be subscribe
      */
-    public void subscribe2strategist(MARKET market, SYMBOL symbol, INTERVAL interval, STRATEGY strategy, StrategyParameter parameters, TickListener listener) {
+    public void subscribe2strategist(MARKET market, SYMBOL symbol, INTERVAL interval, STRATEGY strategy, BaseListener listener) {
         // TODO simplify after testing
+        // TODO get parameters from current learning status
+
+        final StrategyParameter parameters;
+        switch (strategy) {
+            case MM:
+                parameters = new ParameterMovingMomentum(10, 30, 14, 9, 26, 18, 20);
+                break;
+            case RSI:
+                parameters = new ParameterRelativeStrengthIndex(10, 200, 2, 5, 95);
+                break;
+            case CCI:
+                parameters = new ParameterCommodityChannelIndex(200, -5, 100, -100, 5);
+                break;
+            case SAMPLE_ENUM:
+                parameters = null;
+                break;
+            default:
+                throw new IllegalArgumentException("this is not allowed" + strategy);
+        }
+
         final String key = market.toString() + symbol.toString() + interval.toString() + strategy.toString();
         final List<StrategistPackage> strategistList = this.strategistMap.get(key);
         if (strategistList != null) {
@@ -97,6 +149,7 @@ public class StrategistManager {
                 final Strategist strategist = this.strategistRepository.save(new Strategist(strategy, market, symbol, interval, parameters));
                 final StrategistPackage newStrategistPackage = new StrategistPackage(strategist, new HistoryProvider());
                 strategistList.add(newStrategistPackage);
+                log.info("Created new strategist: " + strategist);
             }
         }
         // create a new strategist, subscribe to it and save it in new list
@@ -104,7 +157,7 @@ public class StrategistManager {
             final Strategist strategist = this.strategistRepository.save(new Strategist(strategy, market, symbol, interval, parameters));
             final StrategistPackage newStrategistPackage = new StrategistPackage(strategist, new HistoryProvider());
             this.strategistMap.put(key, List.of(newStrategistPackage));
+            log.info("Created new strategist: " + strategist);
         }
     }
-
 }

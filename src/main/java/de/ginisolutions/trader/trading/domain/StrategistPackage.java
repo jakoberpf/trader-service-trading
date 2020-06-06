@@ -3,7 +3,9 @@ package de.ginisolutions.trader.trading.domain;
 import de.ginisolutions.trader.common.messaging.BaseListener;
 import de.ginisolutions.trader.common.strategy.StrategyFactory;
 import de.ginisolutions.trader.history.domain.TickDTO;
+import de.ginisolutions.trader.trading.domain.enumeration.SIGNAL;
 import de.ginisolutions.trader.trading.messaging.SignalListener;
+import de.ginisolutions.trader.trading.messaging.Signal;
 import de.ginisolutions.trader.trading.messaging.SignalPublisher;
 import de.ginisolutions.trader.trading.management.HistoryProvider;
 import net.engio.mbassy.listener.Handler;
@@ -13,10 +15,7 @@ import org.ta4j.core.*;
 import org.ta4j.core.num.PrecisionNum;
 
 import javax.validation.constraints.NotNull;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 
 /**
  * The StrategistPackage contains the Strategist entity and some simple business logic.
@@ -52,11 +51,11 @@ public class StrategistPackage implements BaseListener {
     }
 
     /**
-     *
      * @param tickDTO
      */
     @Handler
     public void handleTick(TickDTO tickDTO) {
+        log.info("Received tick message");
         if (tickDTO.getMarket().equals(this.strategist.getMarket()) &&
             tickDTO.getSymbol().equals(this.strategist.getSymbol()) &&
             tickDTO.getInterval().equals(this.strategist.getInterval())) {
@@ -70,7 +69,7 @@ public class StrategistPackage implements BaseListener {
                     tickDTO.getClose(),
                     tickDTO.getVolume()
                 );
-                log.info("Added new tick to bar series -> " + tickDTO.toString());
+                log.info("Added tick to bar series -> " + tickDTO.toString());
                 this.decide();
             } else {
                 // TODO update last bar
@@ -87,23 +86,31 @@ public class StrategistPackage implements BaseListener {
         final Bar newBar = this.barSeries.getLastBar();
         final int endIndex = this.barSeries.getEndIndex();
         if (strategy.shouldEnter(endIndex)) {
-            tradingRecord.enter(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000));
-            // TODO publish ENTER signal
+            tradingRecord.enter(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000)); // TODO externalise value 1000 into application.properties
+            this.publisher.publishSignal(new Signal(LocalDateTime.now(), SIGNAL.ENTER));
             // TODO add entry to strategist log
         }
         if (strategy.shouldExit(endIndex)) {
-            tradingRecord.exit(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000));
-            // TODO publish EXIT signal
+            tradingRecord.exit(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000)); // TODO externalise value 1000 into application.properties
+            this.publisher.publishSignal(new Signal(LocalDateTime.now(), SIGNAL.EXIT));
             // TODO add entry to strategist log
         }
     }
 
     /**
-     *
      * @param listener
      */
     public void subscribe(BaseListener listener) {
+        log.info("Subscribing new listener: " + listener);
         this.publisher.subscribe((SignalListener) listener);
+    }
+
+    /**
+     * @param listener
+     */
+    public void unsubscribe(BaseListener listener) {
+        log.info("Unsubscribing new listener: " + listener);
+        this.publisher.unsubscribe((SignalListener) listener);
     }
 
     /**

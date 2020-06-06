@@ -2,12 +2,14 @@ package de.ginisolutions.trader.trading.domain;
 
 import de.ginisolutions.trader.common.market.AccountImpl;
 import de.ginisolutions.trader.common.messaging.BaseListener;
-import de.ginisolutions.trader.trading.messaging.SignalMessage;
+import de.ginisolutions.trader.trading.messaging.Signal;
 import net.engio.mbassy.listener.Handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.NotNull;
+
+import java.text.DecimalFormat;
 
 import static de.ginisolutions.trader.trading.domain.enumeration.SIGNAL.ENTER;
 import static de.ginisolutions.trader.trading.domain.enumeration.SIGNAL.EXIT;
@@ -32,17 +34,32 @@ public class TraderPackage implements BaseListener {
         this.accountImpl = accountImpl;
     }
 
+    /**
+     *
+     * @param signal
+     */
     @Handler
-    private void handleSignal(@NotNull SignalMessage signalMessage) {
+    private void handleSignal(@NotNull Signal signal) {
         log.warn("Got SIGNAL");
-        if (signalMessage.getSignal().equals(ENTER)) {
+        if (signal.getSignal().equals(ENTER)) {
             log.warn("Got ENTER");
         }
-        if (signalMessage.getSignal().equals(EXIT)) {
+        if (signal.getSignal().equals(EXIT)) {
             log.warn("Got EXIT");
         }
-        // TODO enter market with budget
+        // TODO enter/exit market with budget
         // TODO save action to history
+    }
+
+    /**
+     *
+     * @param value
+     * @return
+     */
+    public static double filterAmount(double value) {
+        // TODO check with filters from market, like min/max or step
+        DecimalFormat df = new DecimalFormat("#.#######");
+        return Double.parseDouble(df.format(value).replace(",", "."));
     }
 
     public Trader getTrader() {
