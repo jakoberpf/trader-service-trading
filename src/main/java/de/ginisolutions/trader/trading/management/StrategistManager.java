@@ -21,9 +21,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class StrategistManager {
@@ -36,18 +34,21 @@ public class StrategistManager {
 
     private final HistoryManager historyManager;
 
-    private final Map<String, List<StrategistPackage>> strategistMap;
+    private final HistoryProvider historyProvider;
+
+    private final Map<String, StrategistPackage> strategistMap;
 
     /**
      * Constructor for StrategistManager. Receives ApplicationEventPublisher via dependency injection.
      *
      * @param signalPublisher the eventPublisher, used for publishing an "Initialisation finished event"
      */
-    public StrategistManager(ApplicationEventPublisher signalPublisher, StrategistRepository strategistRepository, HistoryManager historyManager) {
+    public StrategistManager(ApplicationEventPublisher signalPublisher, StrategistRepository strategistRepository, HistoryManager historyManager, HistoryProvider historyProvider) {
         LOGGER.info("Constructing StrategistManager");
         this.signalPublisher = signalPublisher;
         this.strategistRepository = strategistRepository;
         this.historyManager = historyManager;
+        this.historyProvider = historyProvider;
         this.strategistMap = new HashMap<>();
         // TODO add Feign Client for quicker data fetch from database
     }
@@ -60,30 +61,20 @@ public class StrategistManager {
     @EventListener
     public void init(TradingInit init) {
         LOGGER.info("Initializing StrategistManager");
-        final HistoryProvider historyProvider = new HistoryProvider();
         if (init.isHistoryManager()) {
-            this.strategistRepository.findAll().forEach(strategistFromRepo -> {
-                final String key = strategistFromRepo.getMarket().toString() + strategistFromRepo.getSymbol().toString() + strategistFromRepo.getInterval().toString() + strategistFromRepo.getStrategy().toString();
-                final List<StrategistPackage> strategistList = this.strategistMap.get(key);
-                if (strategistList != null) {
-                    if (strategistList.stream()
-                        .anyMatch(strategist -> strategist.getStrategist().getParameters().equals(strategistFromRepo.getParameters()))) {
-                        // parameter are the same -> duplicates in the repository
-                        LOGGER.warn("Found duplicates in the repository, all the later ones are neglected and deleted");
-                        this.strategistRepository.delete(strategistFromRepo);
-                    }
-                    // create a new strategist package and add it to the list
-                    else {
-                        final StrategistPackage newStrategistPackage = new StrategistPackage(strategistFromRepo, historyProvider);
-                        this.historyManager.subscribe2crawler(strategistFromRepo.getMarket(), strategistFromRepo.getSymbol(), strategistFromRepo.getInterval(), newStrategistPackage);
-                        strategistList.add(newStrategistPackage);
-                    }
+            this.strategistRepository.findAll().forEach(strategist -> {
+                final String key = strategist.getMarket().toString() + strategist.getSymbol().toString() + strategist.getInterval().toString() + strategist.getStrategy().toString();
+                final StrategistPackage strategistPackage = this.strategistMap.get(key);
+                if (strategistPackage != null) {
+                    // duplicates in the repository, only the first one is relevant
+                    LOGGER.warn("Found duplicates in the repository, all the later ones are neglected and deleted");
+                    this.strategistRepository.delete(strategist);
                 }
-                // create a new strategist package and add it to the list
+                // create a new strategist package and put it in the map
                 else {
-                    final StrategistPackage newStrategistPackage = new StrategistPackage(strategistFromRepo, historyProvider);
-                    this.historyManager.subscribe2crawler(strategistFromRepo.getMarket(), strategistFromRepo.getSymbol(), strategistFromRepo.getInterval(), newStrategistPackage);
-                    this.strategistMap.put(key, List.of(newStrategistPackage));
+                    final StrategistPackage newStrategistPackage = new StrategistPackage(strategist, historyProvider);
+                    this.historyManager.subscribe2crawler(strategist.getMarket(), strategist.getSymbol(), strategist.getInterval(), newStrategistPackage);
+                    this.strategistMap.put(key, newStrategistPackage);
                 }
             });
             // Initialisation is complete
@@ -98,11 +89,9 @@ public class StrategistManager {
      */
     @Scheduled(fixedDelay = 10000) // TODO user env variable
     private void persist() {
-        this.strategistMap.forEach((s, strategistPackages) -> {
-            strategistPackages.forEach(strategistPackage -> {
-                LOGGER.debug("Persisting trader: {}", strategistPackage.getStrategist());
-                this.strategistRepository.save(strategistPackage.getStrategist());
-            });
+        this.strategistMap.forEach((s, strategistPackage) -> {
+            LOGGER.debug("Persisting trader: {}", strategistPackage.getStrategist());
+            this.strategistRepository.save(strategistPackage.getStrategist());
         });
     }
 
@@ -138,27 +127,16 @@ public class StrategistManager {
         }
 
         final String key = market.toString() + "-" + symbol.toString() + "-" + interval.toString() + "-" + strategy.toString();
-        final List<StrategistPackage> strategistList = this.strategistMap.get(key);
-        if (strategistList != null) {
-            final Optional<StrategistPackage> strategistPackage = strategistList.stream()
-                .filter(strategist -> strategist.getStrategist().getParameters().equals(parameters)).findAny();
-            if (strategistPackage.isPresent()) {
-                // parameter are the same -> subscribe to it
-                strategistPackage.get().subscribe(listener);
-            }
-            // create a new strategist, subscribe to it and add it to the list
-            else {
-                final Strategist strategist = this.strategistRepository.save(new Strategist(strategy, market, symbol, interval, parameters));
-                final StrategistPackage newStrategistPackage = new StrategistPackage(strategist, new HistoryProvider());
-                strategistList.add(newStrategistPackage);
-                LOGGER.info("Created new strategist: " + strategist);
-            }
-        }
-        // create a new strategist, subscribe to it and save it in new list
-        else {
+        final StrategistPackage strategistPackage = this.strategistMap.get(key);
+        if (strategistPackage != null) {
+            // strategist is already present -> subscribe to it
+            strategistPackage.subscribe(listener);
+        } else {
+            // create a new strategist, subscribe to it and save it in new list
             final Strategist strategist = this.strategistRepository.save(new Strategist(strategy, market, symbol, interval, parameters));
-            final StrategistPackage newStrategistPackage = new StrategistPackage(strategist, new HistoryProvider());
-            this.strategistMap.put(key, List.of(newStrategistPackage));
+            final StrategistPackage newStrategistPackage = new StrategistPackage(strategist, this.historyProvider);
+            this.historyManager.subscribe2crawler(strategist.getMarket(), strategist.getSymbol(), strategist.getInterval(), newStrategistPackage);
+            this.strategistMap.put(key, newStrategistPackage);
             LOGGER.info("Created new strategist: " + strategist);
         }
     }
@@ -172,8 +150,9 @@ public class StrategistManager {
      * @param listener defines the tick listener to be subscribe
      */
     public void unsubscribe(MARKET market, SYMBOL symbol, INTERVAL interval, STRATEGY strategy, SignalListener listener) {
+        LOGGER.debug("Unsubscribing {} from {} {} {} {}", listener, market, symbol, interval, strategy);
         final String key = market.toString() + "-" + symbol.toString() + "-" + interval.toString() + "-" + strategy.toString();
-        final List<StrategistPackage> strategistList = this.strategistMap.get(key);
-        LOGGER.warn("Unsubscription is not implemented");
+        final StrategistPackage strategistPackage = this.strategistMap.get(key);
+        strategistPackage.unsubscribe(listener);
     }
 }
