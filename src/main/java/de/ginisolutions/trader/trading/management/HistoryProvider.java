@@ -8,6 +8,7 @@ import de.ginisolutions.trader.history.domain.enumeration.MARKET;
 import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseBarSeriesBuilder;
 import org.ta4j.core.num.PrecisionNum;
@@ -18,9 +19,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+@Service
 public class HistoryProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(HistoryManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HistoryProvider.class);
 
     /**
      * This method will return an short init bar series for initializing a strategy
@@ -30,6 +32,7 @@ public class HistoryProvider {
      * @return BarSeries for the defines enums
      */
     public BarSeries getInitialBarSeries(final MARKET market, final SYMBOL symbol, final INTERVAL interval) {
+        LOGGER.debug("Building initial bar series for {} {} {}", market, symbol, interval);
         // TODO Use FeignClient if available
         return this.getBarSeries(market, symbol, interval, 200); // TODO extract length parameter to application.properties
     }
@@ -43,6 +46,7 @@ public class HistoryProvider {
      * @return BarSeries for the defines enums and length
      */
     public BarSeries getBarSeries(final MARKET market, final SYMBOL symbol, final INTERVAL interval, final int maxLength) {
+        LOGGER.debug("Building bar series for {} {} {} with max length {}", market, symbol, interval, maxLength);
         // get tick from database or market
         final List<TickDTO> ticks = this.getTickList(market, symbol, interval);
         // convert ticks to bar series and return
@@ -60,6 +64,7 @@ public class HistoryProvider {
      * @return a list of ticks
      */
     public List<TickDTO> getTickList(MARKET market, SYMBOL symbol, INTERVAL interval) {
+        LOGGER.debug("Requesting ticks from {} for {} {}", market, symbol, interval);
         switch (market) {
             case BINANCE:
                 final MarketImpl api = MarketImplFactory.buildApi(market);
@@ -78,7 +83,7 @@ public class HistoryProvider {
      * @return BarSeries from the ticks and with the name of the market and symbol
      */
     public BarSeries convertTickListBarSeries(final MARKET market, final SYMBOL symbol, final List<TickDTO> ticks) {
-        log.debug("Building BarSeries for " + market.getName() + " " + symbol.getNameUpper() + " from TickList");
+        LOGGER.debug("Converting tick list to bar series");
         BarSeries barSeries = new BaseBarSeriesBuilder()
             .withName(market.getName() + "-" + symbol.getNameUpper())
             .withNumTypeOf(PrecisionNum.class)
@@ -94,7 +99,7 @@ public class HistoryProvider {
                 tick.getVolume()
             );
         }
-        log.debug("Finished build of " + barSeries.getName() + " with " + barSeries.getBarCount() + " bar/ticks");
+        LOGGER.debug("Finished converting tick list to bar series with " + barSeries.getBarCount() + " bar/ticks");
         return barSeries;
     }
 }

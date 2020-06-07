@@ -41,29 +41,23 @@ public class TraderManager {
 
     /**
      * TODO
-     *
-     * @param init
      */
-    @EventListener()
-    public void init(TradingInit init) {
+    public void init() {
         LOGGER.info("Initializing TraderManager");
-        if (init.isHistoryManager() && init.isStrategistManager()) {
-            traderRepository.findAll().forEach(trader -> {
-                final TraderPackage newTraderPackage = new TraderPackage(trader,
-                    AccountImplFactory.buildAccount(trader.getMarket(), trader.getApiKey(), trader.getApiSecret()));
-                this.strategistManager.subscribe(trader.getMarket(), trader.getSymbol(), trader.getInterval(), trader.getStrategy(), newTraderPackage);
-                this.traderPackageList.add(newTraderPackage);
-            });
-            LOGGER.info("Initialisation of TraderManager complete");
-            init.setTraderManager();
-            this.eventPublisher.publishEvent(init);
-        }
+        traderRepository.findAll().forEach(trader -> {
+            LOGGER.debug("Initializing Trader: {}", trader);
+            final TraderPackage newTraderPackage = new TraderPackage(trader,
+                AccountImplFactory.buildAccount(trader.getMarket(), trader.getApiKey(), trader.getApiSecret()));
+            this.strategistManager.subscribe(trader.getMarket(), trader.getSymbol(), trader.getInterval(), trader.getStrategy(), newTraderPackage);
+            this.traderPackageList.add(newTraderPackage);
+        });
+        LOGGER.info("Initialisation of TraderManager complete");
     }
 
     /**
      * Persist all traders
      */
-    @Scheduled(fixedDelay = 10000) // TODO user env variable
+    @Scheduled(fixedDelay = 20000) // TODO user env variable
     private void persist() {
         this.traderPackageList.forEach(traderPackage -> {
             LOGGER.debug("Persisting trader: {}", traderPackage.getTrader());
@@ -113,7 +107,7 @@ public class TraderManager {
             this.strategistManager.unsubscribe(traderPackage.getTrader().getMarket(), traderPackage.getTrader().getSymbol(), traderPackage.getTrader().getInterval(), traderPackage.getTrader().getStrategy(), traderPackage);
             this.traderPackageList.remove(traderPackage);
         }, () -> {
-                throw new IllegalArgumentException("Trader to edit not found");
+            throw new IllegalArgumentException("Trader to edit not found");
         });
         // add updated package
         final TraderPackage newTraderPackage = new TraderPackage(trader,

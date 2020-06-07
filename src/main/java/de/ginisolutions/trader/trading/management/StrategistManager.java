@@ -28,7 +28,7 @@ public class StrategistManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StrategistManager.class);
 
-    private final ApplicationEventPublisher signalPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
     private final StrategistRepository strategistRepository;
 
@@ -41,11 +41,11 @@ public class StrategistManager {
     /**
      * Constructor for StrategistManager. Receives ApplicationEventPublisher via dependency injection.
      *
-     * @param signalPublisher the eventPublisher, used for publishing an "Initialisation finished event"
+     * @param eventPublisher the eventPublisher, used for publishing an "Initialisation finished event"
      */
-    public StrategistManager(ApplicationEventPublisher signalPublisher, StrategistRepository strategistRepository, HistoryManager historyManager, HistoryProvider historyProvider) {
+    public StrategistManager(ApplicationEventPublisher eventPublisher, StrategistRepository strategistRepository, HistoryManager historyManager, HistoryProvider historyProvider) {
         LOGGER.info("Constructing StrategistManager");
-        this.signalPublisher = signalPublisher;
+        this.eventPublisher = eventPublisher;
         this.strategistRepository = strategistRepository;
         this.historyManager = historyManager;
         this.historyProvider = historyProvider;
@@ -55,39 +55,33 @@ public class StrategistManager {
 
     /**
      * TODO
-     *
-     * @param init
      */
-    @EventListener
-    public void init(TradingInit init) {
+    public void init() {
         LOGGER.info("Initializing StrategistManager");
-        if (init.isHistoryManager()) {
-            this.strategistRepository.findAll().forEach(strategist -> {
-                final String key = strategist.getMarket().toString() + strategist.getSymbol().toString() + strategist.getInterval().toString() + strategist.getStrategy().toString();
-                final StrategistPackage strategistPackage = this.strategistMap.get(key);
-                if (strategistPackage != null) {
-                    // duplicates in the repository, only the first one is relevant
-                    LOGGER.warn("Found duplicates in the repository, all the later ones are neglected and deleted");
-                    this.strategistRepository.delete(strategist);
-                }
-                // create a new strategist package and put it in the map
-                else {
-                    final StrategistPackage newStrategistPackage = new StrategistPackage(strategist, historyProvider);
-                    this.historyManager.subscribe2crawler(strategist.getMarket(), strategist.getSymbol(), strategist.getInterval(), newStrategistPackage);
-                    this.strategistMap.put(key, newStrategistPackage);
-                }
-            });
-            // Initialisation is complete
-            LOGGER.info("Initialisation of StrategistManager complete");
-            init.setHistoryManager();
-            this.signalPublisher.publishEvent(init);
-        }
+        this.strategistRepository.findAll().forEach(strategist -> {
+            final String key = strategist.getMarket().toString() + strategist.getSymbol().toString() + strategist.getInterval().toString() + strategist.getStrategy().toString();
+            final StrategistPackage strategistPackage = this.strategistMap.get(key);
+            if (strategistPackage != null) {
+                // duplicates in the repository, only the first one is relevant
+                LOGGER.warn("Found duplicates in the repository, all the later ones are neglected and deleted");
+                this.strategistRepository.delete(strategist);
+            }
+            // create a new strategist package and put it in the map
+            else {
+                final StrategistPackage newStrategistPackage = new StrategistPackage(strategist, historyProvider);
+                this.historyManager.subscribe2crawler(strategist.getMarket(), strategist.getSymbol(), strategist.getInterval(), newStrategistPackage);
+                this.strategistMap.put(key, newStrategistPackage);
+            }
+        });
+        // Initialisation is complete
+        LOGGER.info("Initialisation of StrategistManager complete");
+
     }
 
     /**
      * Persist all strategists
      */
-    @Scheduled(fixedDelay = 10000) // TODO user env variable
+    @Scheduled(fixedDelay = 20000) // TODO user env variable
     private void persist() {
         this.strategistMap.forEach((s, strategistPackage) -> {
             LOGGER.debug("Persisting trader: {}", strategistPackage.getStrategist());
@@ -104,7 +98,7 @@ public class StrategistManager {
      * @param listener defines the tick listener to be subscribe
      */
     public void subscribe(MARKET market, SYMBOL symbol, INTERVAL interval, STRATEGY strategy, SignalListener listener) {
-        LOGGER.debug("New subscriber for {} {} {} {}", market, symbol, interval, strategy);
+        LOGGER.debug("Subscribing {} to {} {} {} {}", listener, market, symbol, interval, strategy);
 
         // TODO simplify after testing
         // TODO get parameters from current learning status or repository

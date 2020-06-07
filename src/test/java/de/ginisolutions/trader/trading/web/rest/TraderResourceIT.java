@@ -1,7 +1,5 @@
 package de.ginisolutions.trader.trading.web.rest;
 
-import de.ginisolutions.trader.common.strategy.parameter.ParameterMovingMomentum;
-import de.ginisolutions.trader.common.strategy.parameter.StrategyParameter;
 import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
 import de.ginisolutions.trader.history.domain.enumeration.MARKET;
 import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
@@ -14,7 +12,6 @@ import de.ginisolutions.trader.trading.repository.TraderRepository;
 import de.ginisolutions.trader.trading.service.TraderService;
 import de.ginisolutions.trader.trading.service.dto.TraderDTO;
 import de.ginisolutions.trader.trading.service.mapper.TraderMapper;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

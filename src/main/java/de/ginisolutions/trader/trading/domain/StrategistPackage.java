@@ -1,6 +1,5 @@
 package de.ginisolutions.trader.trading.domain;
 
-import de.ginisolutions.trader.common.messaging.BaseListener;
 import de.ginisolutions.trader.common.messaging.TickListener;
 import de.ginisolutions.trader.common.strategy.StrategyFactory;
 import de.ginisolutions.trader.history.domain.TickDTO;
@@ -24,9 +23,9 @@ import java.time.*;
  * the running of the strategy defined in the strategist. I consumes tick events, when a
  * new tick is published by the history service or the internal crawler (which ever comes first)
  */
-public class StrategistPackage extends TickListener {
+public class StrategistPackage implements TickListener {
 
-    private static final Logger log = LoggerFactory.getLogger(StrategistPackage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StrategistPackage.class);
 
     @NotNull
     private final Strategist strategist;
@@ -56,7 +55,7 @@ public class StrategistPackage extends TickListener {
      */
     @Handler
     public void handleTick(TickDTO tickDTO) {
-        log.debug("Received tick message");
+        LOGGER.debug("Received tick message");
         if (tickDTO.getMarket().equals(this.strategist.getMarket()) &&
             tickDTO.getSymbol().equals(this.strategist.getSymbol()) &&
             tickDTO.getInterval().equals(this.strategist.getInterval())) {
@@ -70,7 +69,7 @@ public class StrategistPackage extends TickListener {
                     tickDTO.getClose(),
                     tickDTO.getVolume()
                 );
-                log.info("Added tick to bar series -> " + tickDTO.toString());
+                LOGGER.info("Added tick to bar series -> " + tickDTO.toString());
                 this.decide();
             } else {
                 // TODO update last bar
@@ -83,7 +82,7 @@ public class StrategistPackage extends TickListener {
      *
      */
     public void decide() {
-        log.debug("Decision process...");
+        LOGGER.debug("Decision process...");
         final Bar newBar = this.barSeries.getLastBar();
         final int endIndex = this.barSeries.getEndIndex();
         if (strategy.shouldEnter(endIndex)) {
@@ -102,7 +101,7 @@ public class StrategistPackage extends TickListener {
      * @param listener
      */
     public void subscribe(SignalListener listener) {
-        log.debug("Subscribing new listener: " + listener);
+        LOGGER.debug("Subscribing new listener: " + listener);
         this.publisher.subscribe(listener);
     }
 
@@ -110,7 +109,7 @@ public class StrategistPackage extends TickListener {
      * @param listener
      */
     public void unsubscribe(SignalListener listener) {
-        log.debug("Unsubscribing new listener: " + listener);
+        LOGGER.debug("Unsubscribing new listener: " + listener);
         this.publisher.unsubscribe(listener);
     }
 
