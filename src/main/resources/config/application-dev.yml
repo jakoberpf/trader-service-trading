@@ -117,6 +117,6 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
- application:
-   trading:
-     live: false
+# application:
+#   trading:
+#     live: false

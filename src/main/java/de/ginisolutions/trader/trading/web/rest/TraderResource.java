@@ -29,7 +29,7 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class TraderResource {
 
-    private final Logger log = LoggerFactory.getLogger(TraderResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TraderResource.class);
 
     private static final String ENTITY_NAME = "traderServiceTradingTrader";
 
@@ -39,7 +39,7 @@ public class TraderResource {
     private final TraderService traderService; // TODO user Platform to control Traders
 
     public TraderResource(TraderService traderService) {
-        log.info("Constructing TraderResource");
+        LOGGER.info("Constructing TraderResource");
         this.traderService = traderService;
     }
 
@@ -52,7 +52,7 @@ public class TraderResource {
      */
     @PostMapping("/traders")
     public ResponseEntity<TraderDTO> createTrader(@Valid @RequestBody TraderDTO traderDTO) throws URISyntaxException {
-        log.debug("REST request to save Trader : {}", traderDTO);
+        LOGGER.debug("REST request to save Trader : {}", traderDTO);
         if (traderDTO.getId() != null) {
             throw new BadRequestAlertException("A new trader cannot already have an ID", ENTITY_NAME, "idexists");
         }
@@ -73,7 +73,7 @@ public class TraderResource {
      */
     @PutMapping("/traders")
     public ResponseEntity<TraderDTO> updateTrader(@Valid @RequestBody TraderDTO traderDTO) throws URISyntaxException {
-        log.debug("REST request to update Trader : {}", traderDTO);
+        LOGGER.debug("REST request to update Trader : {}", traderDTO);
         if (traderDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -90,7 +90,7 @@ public class TraderResource {
      */
     @GetMapping("/traders")
     public List<TraderDTO> getAllTraders() {
-        log.debug("REST request to get all Traders");
+        LOGGER.debug("REST request to get all Traders");
         return traderService.findAll();
     }
 
@@ -102,7 +102,7 @@ public class TraderResource {
      */
     @GetMapping("/traders/{id}")
     public ResponseEntity<TraderDTO> getTrader(@PathVariable String id) {
-        log.debug("REST request to get Trader : {}", id);
+        LOGGER.debug("REST request to get Trader : {}", id);
         Optional<TraderDTO> traderDTO = traderService.findOne(id);
         return ResponseUtil.wrapOrNotFound(traderDTO);
     }
@@ -115,7 +115,7 @@ public class TraderResource {
      */
     @DeleteMapping("/traders/{id}")
     public ResponseEntity<Void> deleteTrader(@PathVariable String id) {
-        log.debug("REST request to delete Trader : {}", id);
+        LOGGER.debug("REST request to delete Trader : {}", id);
 
         traderService.delete(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id)).build();

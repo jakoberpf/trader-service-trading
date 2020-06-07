@@ -21,7 +21,7 @@ import java.util.List;
 @Service
 public class TraderManager {
 
-    private static final Logger log = LoggerFactory.getLogger(StrategistManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TraderManager.class);
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -32,7 +32,7 @@ public class TraderManager {
     private final List<TraderPackage> traderPackageList;
 
     public TraderManager(ApplicationEventPublisher eventPublisher, TraderRepository traderRepository, StrategistManager strategistManager) {
-        log.info("Constructing TraderManager");
+        LOGGER.info("Constructing TraderManager");
         this.eventPublisher = eventPublisher;
         this.traderRepository = traderRepository;
         this.strategistManager = strategistManager;
@@ -46,15 +46,15 @@ public class TraderManager {
      */
     @EventListener()
     public void init(TradingInit init) {
-        log.info("Initializing TraderManager");
+        LOGGER.info("Initializing TraderManager");
         if (init.isHistoryManager() && init.isStrategistManager()) {
             traderRepository.findAll().forEach(trader -> {
                 final TraderPackage newTraderPackage = new TraderPackage(trader,
                     AccountImplFactory.buildAccount(trader.getMarket(), trader.getApiKey(), trader.getApiSecret()));
-                this.strategistManager.subscribe2strategist(trader.getMarket(), trader.getSymbol(), trader.getInterval(), trader.getStrategy(), newTraderPackage);
+                this.strategistManager.subscribe(trader.getMarket(), trader.getSymbol(), trader.getInterval(), trader.getStrategy(), newTraderPackage);
                 this.traderPackageList.add(newTraderPackage);
             });
-            log.info("Initialisation of TraderManager complete");
+            LOGGER.info("Initialisation of TraderManager complete");
             init.setTraderManager();
             this.eventPublisher.publishEvent(init);
         }
@@ -63,9 +63,10 @@ public class TraderManager {
     /**
      * Persist all traders
      */
-    @Scheduled(fixedDelay = 1000) // TODO user env variable
+    @Scheduled(fixedDelay = 10000) // TODO user env variable
     private void persist() {
         this.traderPackageList.forEach(traderPackage -> {
+            LOGGER.debug("Persisting trader: {}", traderPackage.getTrader());
             this.traderRepository.save(traderPackage.getTrader());
         });
     }
@@ -75,11 +76,23 @@ public class TraderManager {
      * @return
      */
     public Trader add(Trader trader) {
+        LOGGER.debug("Adding Trader : {}", trader);
+        if (trader.getId() != null) {
+            throw new IllegalArgumentException("A new trader cannot already have an ID");
+        }
         // persist trader
         trader = this.traderRepository.save(trader);
         // add package
-        this.traderPackageList.add(new TraderPackage(trader,
-            AccountImplFactory.buildAccount(trader.getMarket(), trader.getApiKey(), trader.getApiSecret())));
+//        try {
+        final TraderPackage newTraderPackage = new TraderPackage(trader,
+            AccountImplFactory.buildAccount(trader.getMarket(), trader.getApiKey(), trader.getApiSecret()));
+        this.strategistManager.subscribe(trader.getMarket(), trader.getSymbol(), trader.getInterval(), trader.getStrategy(), newTraderPackage);
+        this.traderPackageList.add(newTraderPackage);
+//        } catch (Exception exception) {
+//            this.traderRepository.delete(trader);
+//            throw new RuntimeException("Unable to add trader, rolling back repository", exception);
+//        }
+        LOGGER.debug("Adding Trader successful: {}", trader);
         return trader;
     }
 
@@ -88,18 +101,28 @@ public class TraderManager {
      * @return
      */
     public Trader edit(Trader trader) {
+        LOGGER.debug("Editing Trader : {}", trader);
         if (trader.getId() == null) {
-            throw new IllegalArgumentException("Trader must have id to be edited in manager");
+            throw new IllegalArgumentException("A trader must have id to be edited in manager");
         }
         // remove old package
         Trader current = trader;
         this.traderPackageList.stream().filter(traderPackage ->
-            traderPackage.getTrader().getId().equals(current.getId())).findFirst().ifPresent(this.traderPackageList::remove);
+            traderPackage.getTrader().getId().equals(current.getId())).findFirst().ifPresentOrElse(traderPackage -> {
+            LOGGER.debug("Found trader to edit, unsubscribing and removing package");
+            this.strategistManager.unsubscribe(traderPackage.getTrader().getMarket(), traderPackage.getTrader().getSymbol(), traderPackage.getTrader().getInterval(), traderPackage.getTrader().getStrategy(), traderPackage);
+            this.traderPackageList.remove(traderPackage);
+        }, () -> {
+                throw new IllegalArgumentException("Trader to edit not found");
+        });
         // add updated package
-        this.traderPackageList.add(new TraderPackage(trader,
-            AccountImplFactory.buildAccount(trader.getMarket(), trader.getApiKey(), trader.getApiSecret())));
+        final TraderPackage newTraderPackage = new TraderPackage(trader,
+            AccountImplFactory.buildAccount(trader.getMarket(), trader.getApiKey(), trader.getApiSecret()));
+        this.strategistManager.subscribe(trader.getMarket(), trader.getSymbol(), trader.getInterval(), trader.getStrategy(), newTraderPackage);
+        this.traderPackageList.add(newTraderPackage);
         // persist trader
         trader = this.traderRepository.save(trader);
+        LOGGER.debug("Adding Trader successful: {}", trader);
         return trader;
     }
 
@@ -108,6 +131,7 @@ public class TraderManager {
      * @return
      */
     public Trader remove(Trader trader) {
+        LOGGER.debug("Removing Trader : {}", trader);
         // remove package
         Trader current = trader;
         this.traderPackageList.stream().filter(traderPackage ->
@@ -115,5 +139,12 @@ public class TraderManager {
         // truncate
         this.traderRepository.delete(trader);
         return trader;
+    }
+
+    /**
+     * @return the number of trader packages (running) in the list
+     */
+    public int count() {
+        return traderPackageList.size();
     }
 }

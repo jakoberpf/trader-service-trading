@@ -1,6 +1,7 @@
 package de.ginisolutions.trader.trading.domain;
 
 import de.ginisolutions.trader.common.messaging.BaseListener;
+import de.ginisolutions.trader.common.messaging.TickListener;
 import de.ginisolutions.trader.common.strategy.StrategyFactory;
 import de.ginisolutions.trader.history.domain.TickDTO;
 import de.ginisolutions.trader.trading.domain.enumeration.SIGNAL;
@@ -23,7 +24,7 @@ import java.time.*;
  * the running of the strategy defined in the strategist. I consumes tick events, when a
  * new tick is published by the history service or the internal crawler (which ever comes first)
  */
-public class StrategistPackage implements BaseListener {
+public class StrategistPackage extends TickListener {
 
     private static final Logger log = LoggerFactory.getLogger(StrategistPackage.class);
 
@@ -55,7 +56,7 @@ public class StrategistPackage implements BaseListener {
      */
     @Handler
     public void handleTick(TickDTO tickDTO) {
-        log.info("Received tick message");
+        log.debug("Received tick message");
         if (tickDTO.getMarket().equals(this.strategist.getMarket()) &&
             tickDTO.getSymbol().equals(this.strategist.getSymbol()) &&
             tickDTO.getInterval().equals(this.strategist.getInterval())) {
@@ -82,7 +83,7 @@ public class StrategistPackage implements BaseListener {
      *
      */
     public void decide() {
-        log.info("Decision process...");
+        log.debug("Decision process...");
         final Bar newBar = this.barSeries.getLastBar();
         final int endIndex = this.barSeries.getEndIndex();
         if (strategy.shouldEnter(endIndex)) {
@@ -100,17 +101,17 @@ public class StrategistPackage implements BaseListener {
     /**
      * @param listener
      */
-    public void subscribe(BaseListener listener) {
-        log.info("Subscribing new listener: " + listener);
-        this.publisher.subscribe((SignalListener) listener);
+    public void subscribe(SignalListener listener) {
+        log.debug("Subscribing new listener: " + listener);
+        this.publisher.subscribe(listener);
     }
 
     /**
      * @param listener
      */
-    public void unsubscribe(BaseListener listener) {
-        log.info("Unsubscribing new listener: " + listener);
-        this.publisher.unsubscribe((SignalListener) listener);
+    public void unsubscribe(SignalListener listener) {
+        log.debug("Unsubscribing new listener: " + listener);
+        this.publisher.unsubscribe(listener);
     }
 
     /**

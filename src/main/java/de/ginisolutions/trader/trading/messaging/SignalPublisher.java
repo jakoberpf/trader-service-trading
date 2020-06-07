@@ -25,7 +25,7 @@ public class SignalPublisher {
      * @param listener defines the listener to subscribe to the event bus
      */
     public void subscribe(SignalListener listener) {
-        LOGGER.info("Subscribing new listener: " + listener);
+        LOGGER.debug("Subscribing new listener: " + listener);
         this.bus.subscribe(listener);
     }
 
@@ -34,7 +34,7 @@ public class SignalPublisher {
      * @param listener defines the listener to unsubscribe from the event bus
      */
     public void unsubscribe(SignalListener listener) {
-        LOGGER.info("Unsubscribing listener: " + listener);
+        LOGGER.debug("Unsubscribing listener: " + listener);
         this.bus.unsubscribe(listener);
     }
 
@@ -43,21 +43,21 @@ public class SignalPublisher {
      * @param aync
      * @return
      */
-    public boolean publishSignal(Signal signal, boolean aync) {
+    public void publishSignal(Signal signal, boolean aync) {
+        LOGGER.debug("Publishing signal: " + signal);
         if (aync) {
             this.bus.post(signal).asynchronously();
         } else {
             this.publishSignal(signal);
         }
-        return true;
     }
 
     /**
      * @param signal
      * @return
      */
-    public boolean publishSignal(Signal signal) {
+    public void publishSignal(Signal signal) {
+        LOGGER.debug("Publishing signal: " + signal);
         this.bus.post(signal).now();
-        return true;
     }
 }

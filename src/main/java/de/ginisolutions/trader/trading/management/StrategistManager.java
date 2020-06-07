@@ -1,7 +1,5 @@
 package de.ginisolutions.trader.trading.management;
 
-import de.ginisolutions.trader.common.messaging.BaseListener;
-import de.ginisolutions.trader.common.messaging.TickListener;
 import de.ginisolutions.trader.common.strategy.parameter.ParameterCommodityChannelIndex;
 import de.ginisolutions.trader.common.strategy.parameter.ParameterMovingMomentum;
 import de.ginisolutions.trader.common.strategy.parameter.ParameterRelativeStrengthIndex;
@@ -13,6 +11,7 @@ import de.ginisolutions.trader.trading.domain.Strategist;
 import de.ginisolutions.trader.trading.domain.StrategistPackage;
 import de.ginisolutions.trader.trading.domain.enumeration.STRATEGY;
 import de.ginisolutions.trader.trading.event.TradingInit;
+import de.ginisolutions.trader.trading.messaging.SignalListener;
 import de.ginisolutions.trader.trading.repository.StrategistRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +28,9 @@ import java.util.Optional;
 @Service
 public class StrategistManager {
 
-    private static final Logger log = LoggerFactory.getLogger(StrategistManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StrategistManager.class);
 
-    private final ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher signalPublisher;
 
     private final StrategistRepository strategistRepository;
 
@@ -42,11 +41,11 @@ public class StrategistManager {
     /**
      * Constructor for StrategistManager. Receives ApplicationEventPublisher via dependency injection.
      *
-     * @param eventPublisher the eventPublisher, used for publishing an "Initialisation finished event"
+     * @param signalPublisher the eventPublisher, used for publishing an "Initialisation finished event"
      */
-    public StrategistManager(ApplicationEventPublisher eventPublisher, StrategistRepository strategistRepository, HistoryManager historyManager) {
-        log.info("Constructing StrategistManager");
-        this.eventPublisher = eventPublisher;
+    public StrategistManager(ApplicationEventPublisher signalPublisher, StrategistRepository strategistRepository, HistoryManager historyManager) {
+        LOGGER.info("Constructing StrategistManager");
+        this.signalPublisher = signalPublisher;
         this.strategistRepository = strategistRepository;
         this.historyManager = historyManager;
         this.strategistMap = new HashMap<>();
@@ -60,7 +59,7 @@ public class StrategistManager {
      */
     @EventListener
     public void init(TradingInit init) {
-        log.info("Initializing StrategistManager");
+        LOGGER.info("Initializing StrategistManager");
         final HistoryProvider historyProvider = new HistoryProvider();
         if (init.isHistoryManager()) {
             this.strategistRepository.findAll().forEach(strategistFromRepo -> {
@@ -70,7 +69,7 @@ public class StrategistManager {
                     if (strategistList.stream()
                         .anyMatch(strategist -> strategist.getStrategist().getParameters().equals(strategistFromRepo.getParameters()))) {
                         // parameter are the same -> duplicates in the repository
-                        log.warn("Found duplicates in the repository, all the later ones are neglected and deleted");
+                        LOGGER.warn("Found duplicates in the repository, all the later ones are neglected and deleted");
                         this.strategistRepository.delete(strategistFromRepo);
                     }
                     // create a new strategist package and add it to the list
@@ -83,23 +82,25 @@ public class StrategistManager {
                 // create a new strategist package and add it to the list
                 else {
                     final StrategistPackage newStrategistPackage = new StrategistPackage(strategistFromRepo, historyProvider);
+                    this.historyManager.subscribe2crawler(strategistFromRepo.getMarket(), strategistFromRepo.getSymbol(), strategistFromRepo.getInterval(), newStrategistPackage);
                     this.strategistMap.put(key, List.of(newStrategistPackage));
                 }
             });
             // Initialisation is complete
-            log.info("Initialisation of StrategistManager complete");
+            LOGGER.info("Initialisation of StrategistManager complete");
             init.setHistoryManager();
-            this.eventPublisher.publishEvent(init);
+            this.signalPublisher.publishEvent(init);
         }
     }
 
     /**
      * Persist all strategists
      */
-    @Scheduled(fixedDelay = 1000) // TODO user env variable
+    @Scheduled(fixedDelay = 10000) // TODO user env variable
     private void persist() {
         this.strategistMap.forEach((s, strategistPackages) -> {
             strategistPackages.forEach(strategistPackage -> {
+                LOGGER.debug("Persisting trader: {}", strategistPackage.getStrategist());
                 this.strategistRepository.save(strategistPackage.getStrategist());
             });
         });
@@ -113,10 +114,11 @@ public class StrategistManager {
      * @param interval defines the interval of the crawler
      * @param listener defines the tick listener to be subscribe
      */
-    public void subscribe2strategist(MARKET market, SYMBOL symbol, INTERVAL interval, STRATEGY strategy, BaseListener listener) {
-        // TODO simplify after testing
-        // TODO get parameters from current learning status
+    public void subscribe(MARKET market, SYMBOL symbol, INTERVAL interval, STRATEGY strategy, SignalListener listener) {
+        LOGGER.debug("New subscriber for {} {} {} {}", market, symbol, interval, strategy);
 
+        // TODO simplify after testing
+        // TODO get parameters from current learning status or repository
         final StrategyParameter parameters;
         switch (strategy) {
             case MM:
@@ -135,7 +137,7 @@ public class StrategistManager {
                 throw new IllegalArgumentException("this is not allowed" + strategy);
         }
 
-        final String key = market.toString() + symbol.toString() + interval.toString() + strategy.toString();
+        final String key = market.toString() + "-" + symbol.toString() + "-" + interval.toString() + "-" + strategy.toString();
         final List<StrategistPackage> strategistList = this.strategistMap.get(key);
         if (strategistList != null) {
             final Optional<StrategistPackage> strategistPackage = strategistList.stream()
@@ -149,7 +151,7 @@ public class StrategistManager {
                 final Strategist strategist = this.strategistRepository.save(new Strategist(strategy, market, symbol, interval, parameters));
                 final StrategistPackage newStrategistPackage = new StrategistPackage(strategist, new HistoryProvider());
                 strategistList.add(newStrategistPackage);
-                log.info("Created new strategist: " + strategist);
+                LOGGER.info("Created new strategist: " + strategist);
             }
         }
         // create a new strategist, subscribe to it and save it in new list
@@ -157,7 +159,21 @@ public class StrategistManager {
             final Strategist strategist = this.strategistRepository.save(new Strategist(strategy, market, symbol, interval, parameters));
             final StrategistPackage newStrategistPackage = new StrategistPackage(strategist, new HistoryProvider());
             this.strategistMap.put(key, List.of(newStrategistPackage));
-            log.info("Created new strategist: " + strategist);
+            LOGGER.info("Created new strategist: " + strategist);
         }
+    }
+
+    /**
+     * This method subscribes the provided signal listener to the strategist defined by the parameters strategy, market, symbol and interval
+     *
+     * @param market   defines the market of the crawler
+     * @param symbol   defines the symbol of the crawler
+     * @param interval defines the interval of the crawler
+     * @param listener defines the tick listener to be subscribe
+     */
+    public void unsubscribe(MARKET market, SYMBOL symbol, INTERVAL interval, STRATEGY strategy, SignalListener listener) {
+        final String key = market.toString() + "-" + symbol.toString() + "-" + interval.toString() + "-" + strategy.toString();
+        final List<StrategistPackage> strategistList = this.strategistMap.get(key);
+        LOGGER.warn("Unsubscription is not implemented");
     }
 }

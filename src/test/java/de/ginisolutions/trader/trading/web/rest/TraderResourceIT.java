@@ -9,6 +9,7 @@ import de.ginisolutions.trader.trading.TraderServiceTradingApp;
 import de.ginisolutions.trader.trading.config.TestSecurityConfiguration;
 import de.ginisolutions.trader.trading.domain.Trader;
 import de.ginisolutions.trader.trading.domain.enumeration.STRATEGY;
+import de.ginisolutions.trader.trading.management.TraderManager;
 import de.ginisolutions.trader.trading.repository.TraderRepository;
 import de.ginisolutions.trader.trading.service.TraderService;
 import de.ginisolutions.trader.trading.service.dto.TraderDTO;
@@ -34,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Integration tests for the {@link TraderResource} REST controller.
  */
-@SpringBootTest(classes = { TraderServiceTradingApp.class, TestSecurityConfiguration.class })
+@SpringBootTest(classes = {TraderServiceTradingApp.class, TestSecurityConfiguration.class})
 @AutoConfigureMockMvc
 @WithMockUser
 public class TraderResourceIT {
@@ -45,17 +46,17 @@ public class TraderResourceIT {
     private static final String DEFAULT_OWNER = "AAAAAAAAAA";
     private static final String UPDATED_OWNER = "BBBBBBBBBB";
 
-    private static final MARKET DEFAULT_MARKET = MARKET.SAMPLE_ENUM; // TODO user real enums
-    private static final MARKET UPDATED_MARKET = MARKET.SAMPLE_ENUM; // TODO user real enums
+    private static final MARKET DEFAULT_MARKET = MARKET.BINANCE;
+    private static final MARKET UPDATED_MARKET = MARKET.BINANCE;
 
-    private static final SYMBOL DEFAULT_SYMBOL = SYMBOL.SAMPLE_SYMBOL; // TODO user real enums
-    private static final SYMBOL UPDATED_SYMBOL = SYMBOL.SAMPLE_SYMBOL; // TODO user real enums
+    private static final SYMBOL DEFAULT_SYMBOL = SYMBOL.BTCUSDT;
+    private static final SYMBOL UPDATED_SYMBOL = SYMBOL.BTCUSDT;
 
-    private static final INTERVAL DEFAULT_INTERVAL = INTERVAL.SAMPLE_SYMBOL; // TODO user real enums
-    private static final INTERVAL UPDATED_INTERVAL = INTERVAL.SAMPLE_SYMBOL; // TODO user real enums
+    private static final INTERVAL DEFAULT_INTERVAL = INTERVAL.ONE_MINUTE;
+    private static final INTERVAL UPDATED_INTERVAL = INTERVAL.ONE_MINUTE;
 
-    private static final STRATEGY DEFAULT_STRATEGY = STRATEGY.SAMPLE_ENUM; // TODO user real enums
-    private static final STRATEGY UPDATED_STRATEGY = STRATEGY.SAMPLE_ENUM; // TODO user real enums
+    private static final STRATEGY DEFAULT_STRATEGY = STRATEGY.RSI;
+    private static final STRATEGY UPDATED_STRATEGY = STRATEGY.RSI;
 
     private static final String DEFAULT_API_KEY = "AAAAAAAAAA";
     private static final String UPDATED_API_KEY = "BBBBBBBBBB";
@@ -76,6 +77,12 @@ public class TraderResourceIT {
     private TraderRepository traderRepository;
 
     @Autowired
+    private TraderService traderService;
+
+    @Autowired
+    private TraderManager traderManager;
+
+    @Autowired
     private TraderMapper traderMapper;
 
     @Autowired
@@ -85,7 +92,7 @@ public class TraderResourceIT {
 
     /**
      * Create an entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
@@ -104,9 +111,10 @@ public class TraderResourceIT {
             .budget(DEFAULT_BUDGET);
         return trader;
     }
+
     /**
      * Create an updated entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
@@ -128,7 +136,9 @@ public class TraderResourceIT {
 
     @BeforeEach
     public void initTest() {
-        traderRepository.deleteAll();
+        traderRepository.findAll().forEach(trader -> traderService.delete(trader.getId()));
+        assertThat(traderRepository.count()).isEqualTo(0L);
+        assertThat(traderManager.count()).isEqualTo(0);
         trader = createEntity();
     }
 
@@ -395,6 +405,7 @@ public class TraderResourceIT {
             .andExpect(jsonPath("$.isIn").value(DEFAULT_IS_IN.booleanValue()))
             .andExpect(jsonPath("$.budget").value(DEFAULT_BUDGET.doubleValue()));
     }
+
     @Test
     public void getNonExistingTrader() throws Exception {
         // Get the trader
@@ -405,12 +416,15 @@ public class TraderResourceIT {
     @Test
     public void updateTrader() throws Exception {
         // Initialize the database
-        traderRepository.save(trader);
+        int databaseSizeBeforeInsert = traderRepository.findAll().size();
+
+        final Trader insertedTrader = this.traderManager.add(trader);
+        assertThat(traderRepository.count()).isEqualTo(databaseSizeBeforeInsert + 1);
 
         int databaseSizeBeforeUpdate = traderRepository.findAll().size();
 
         // Update the trader
-        Trader updatedTrader = traderRepository.findById(trader.getId()).get();
+        Trader updatedTrader = traderRepository.findById(insertedTrader.getId()).get();
         updatedTrader
             .name(UPDATED_NAME)
             .owner(UPDATED_OWNER)

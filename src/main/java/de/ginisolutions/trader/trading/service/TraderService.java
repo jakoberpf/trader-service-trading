@@ -1,7 +1,6 @@
 package de.ginisolutions.trader.trading.service;
 
 import de.ginisolutions.trader.trading.domain.Trader;
-import de.ginisolutions.trader.trading.event.TradingInit;
 import de.ginisolutions.trader.trading.management.TraderManager;
 import de.ginisolutions.trader.trading.repository.TraderRepository;
 import de.ginisolutions.trader.trading.service.dto.TraderDTO;
@@ -9,10 +8,8 @@ import de.ginisolutions.trader.trading.service.mapper.TraderMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,7 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class TraderService {
 
-    private final Logger log = LoggerFactory.getLogger(TraderService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TraderService.class);
 
     private final TraderRepository traderRepository;
 
@@ -32,7 +29,7 @@ public class TraderService {
     private final TraderMapper traderMapper;
 
     public TraderService(TraderRepository traderRepository, TraderManager traderManager, TraderMapper traderMapper) {
-        log.info("Constructing TradingService");
+        LOGGER.info("Constructing TradingService");
         this.traderRepository = traderRepository;
         this.traderManager = traderManager;
         this.traderMapper = traderMapper;
@@ -45,8 +42,10 @@ public class TraderService {
      * @return the persisted entity.
      */
     public TraderDTO create(TraderDTO traderDTO) {
-        log.debug("Request to create Trader : {}", traderDTO);
-        // TODO check id not present
+        LOGGER.debug("Request to create Trader : {}", traderDTO);
+        if (traderDTO.getId() != null) {
+            throw new IllegalArgumentException("A new trader cannot already have an ID");
+        }
         Trader trader = traderMapper.toEntity(traderDTO);
         trader = this.traderManager.add(trader);
         return traderMapper.toDto(trader);
@@ -59,8 +58,10 @@ public class TraderService {
      * @return the persisted entity.
      */
     public TraderDTO update(TraderDTO traderDTO) {
-        log.debug("Request to update Trader : {}", traderDTO);
-        // TODO check id present
+        LOGGER.debug("Request to update Trader : {}", traderDTO);
+        if (traderDTO.getId() == null) {
+            throw new IllegalArgumentException("A trader must have a ID to be updated");
+        }
         Trader trader = traderMapper.toEntity(traderDTO);
         trader = this.traderManager.edit(trader);
         return traderMapper.toDto(trader);
@@ -72,7 +73,7 @@ public class TraderService {
      * @return the list of entities.
      */
     public List<TraderDTO> findAll() {
-        log.debug("Request to get all Traders");
+        LOGGER.debug("Request to get all Traders");
         return traderRepository.findAll().stream()
             .map(traderMapper::toDto)
             .collect(Collectors.toList());
@@ -86,7 +87,7 @@ public class TraderService {
      * @return the list of entities.
      */
     public List<TraderDTO> findAllByOwner(String owner) {
-        log.debug("Request to get all Traders");
+        LOGGER.debug("Request to get all Traders");
         return traderRepository.findAllByOwner(owner).stream()
             .map(traderMapper::toDto)
             .collect(Collectors.toList());
@@ -100,7 +101,7 @@ public class TraderService {
      * @return the entity.
      */
     public Optional<TraderDTO> findOne(String id) {
-        log.debug("Request to get Trader : {}", id);
+        LOGGER.debug("Request to get Trader : {}", id);
         return traderRepository.findById(id).map(traderMapper::toDto);
     }
 
@@ -110,7 +111,7 @@ public class TraderService {
      * @param id the id of the entity.
      */
     public void delete(String id) {
-        log.debug("Request to delete Trader : {}", id);
+        LOGGER.debug("Request to delete Trader : {}", id);
         Trader trader = this.traderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Unable to find trader with id: " + id));
         trader = this.traderManager.remove(trader);
         // TODO return message
