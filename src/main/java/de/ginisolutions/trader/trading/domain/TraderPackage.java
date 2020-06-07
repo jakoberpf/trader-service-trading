@@ -1,7 +1,8 @@
 package de.ginisolutions.trader.trading.domain;
 
 import de.ginisolutions.trader.common.market.AccountImpl;
-import de.ginisolutions.trader.trading.messaging.Signal;
+import de.ginisolutions.trader.common.market.AccountImplFactory;
+import de.ginisolutions.trader.trading.messaging.SignalMessage;
 import de.ginisolutions.trader.trading.messaging.SignalListener;
 import net.engio.mbassy.listener.Handler;
 import org.slf4j.Logger;
@@ -30,23 +31,24 @@ public class TraderPackage implements SignalListener {
 
     public TraderPackage(@NotNull Trader trader, @NotNull AccountImpl accountImpl) {
         this.trader = trader;
-        this.accountImpl = accountImpl;
+        this.accountImpl = AccountImplFactory.buildAccount(trader.getMarket(), trader.getApiKey(), trader.getApiSecret());
     }
 
     /**
      *
-     * @param signal
+     * @param signalMessage
      */
     @Handler
-    private void handleSignal(@NotNull Signal signal) {
+    private void handleSignal(@NotNull SignalMessage signalMessage) {
         LOGGER.warn("Got SIGNAL");
-        if (signal.getSignal().equals(ENTER)) {
+        if (signalMessage.getSignal().equals(ENTER)) {
             LOGGER.warn("Got ENTER");
+            this.accountImpl.makeOrder(trader.getSymbol(), getTrader().getBudget(), "buy"); // TODO implement enum for buy/sell
         }
-        if (signal.getSignal().equals(EXIT)) {
+        if (signalMessage.getSignal().equals(EXIT)) {
             LOGGER.warn("Got EXIT");
+            this.accountImpl.makeOrder(trader.getSymbol(), getTrader().getBudget(), "sell"); // TODO implement enum for buy/sell
         }
-        // TODO enter/exit market with budget
         // TODO save action to history
     }
 

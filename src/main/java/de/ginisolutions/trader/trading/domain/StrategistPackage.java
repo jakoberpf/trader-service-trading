@@ -5,7 +5,7 @@ import de.ginisolutions.trader.common.strategy.StrategyFactory;
 import de.ginisolutions.trader.history.domain.TickDTO;
 import de.ginisolutions.trader.trading.domain.enumeration.SIGNAL;
 import de.ginisolutions.trader.trading.messaging.SignalListener;
-import de.ginisolutions.trader.trading.messaging.Signal;
+import de.ginisolutions.trader.trading.messaging.SignalMessage;
 import de.ginisolutions.trader.trading.messaging.SignalPublisher;
 import de.ginisolutions.trader.trading.management.HistoryProvider;
 import net.engio.mbassy.listener.Handler;
@@ -39,15 +39,11 @@ public class StrategistPackage implements TickListener {
     @NotNull
     private final BarSeries barSeries;
 
-    @NotNull
-    private final TradingRecord tradingRecord;
-
     public StrategistPackage(@NotNull Strategist strategist, @NotNull HistoryProvider historyProvider) {
         this.strategist = strategist;
         this.publisher = new SignalPublisher();
         this.barSeries = historyProvider.getInitialBarSeries(strategist.getMarket(), strategist.getSymbol(), strategist.getInterval());
         this.strategy = StrategyFactory.buildStrategy(this.barSeries, strategist.getStrategy(), strategist.getParameters());
-        this.tradingRecord = new BaseTradingRecord();
     }
 
     /**
@@ -82,17 +78,18 @@ public class StrategistPackage implements TickListener {
      *
      */
     public void decide() {
-        LOGGER.debug("Decision process...");
         final Bar newBar = this.barSeries.getLastBar();
         final int endIndex = this.barSeries.getEndIndex();
         if (strategy.shouldEnter(endIndex)) {
-            tradingRecord.enter(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000)); // TODO externalise value 1000 into application.properties
-            this.publisher.publishSignal(new Signal(LocalDateTime.now(), SIGNAL.ENTER));
+            LOGGER.debug("Strategy should ENTER");
+            this.strategist.getTradingRecord().enter(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000)); // TODO externalise value 1000 into application.properties
+            this.publisher.publishSignal(new SignalMessage(SIGNAL.ENTER, strategist.getMarket(), strategist.getSymbol(), strategist.getInterval(), strategist.getStrategy()), false);
             // TODO add entry to strategist log
         }
         if (strategy.shouldExit(endIndex)) {
-            tradingRecord.exit(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000)); // TODO externalise value 1000 into application.properties
-            this.publisher.publishSignal(new Signal(LocalDateTime.now(), SIGNAL.EXIT));
+            LOGGER.debug("Strategy should EXIT");
+            this.strategist.getTradingRecord().exit(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000)); // TODO externalise value 1000 into application.properties
+            this.publisher.publishSignal(new SignalMessage(SIGNAL.EXIT, strategist.getMarket(), strategist.getSymbol(), strategist.getInterval(), strategist.getStrategy()), false);
             // TODO add entry to strategist log
         }
     }

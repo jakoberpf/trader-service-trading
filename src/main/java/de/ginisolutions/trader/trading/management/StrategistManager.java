@@ -59,7 +59,7 @@ public class StrategistManager {
     public void init() {
         LOGGER.info("Initializing StrategistManager");
         this.strategistRepository.findAll().forEach(strategist -> {
-            final String key = strategist.getMarket().toString() + strategist.getSymbol().toString() + strategist.getInterval().toString() + strategist.getStrategy().toString();
+            final String key = strategist.getMarket().toString() + "-" + strategist.getSymbol().toString() + "-" + strategist.getInterval().toString() + "-" + strategist.getStrategy().toString();
             final StrategistPackage strategistPackage = this.strategistMap.get(key);
             if (strategistPackage != null) {
                 // duplicates in the repository, only the first one is relevant
@@ -84,7 +84,7 @@ public class StrategistManager {
     @Scheduled(fixedDelay = 20000) // TODO user env variable
     private void persist() {
         this.strategistMap.forEach((s, strategistPackage) -> {
-            LOGGER.debug("Persisting trader: {}", strategistPackage.getStrategist());
+            LOGGER.debug("Persisting strategist: {}", strategistPackage.getStrategist());
             this.strategistRepository.save(strategistPackage.getStrategist());
         });
     }

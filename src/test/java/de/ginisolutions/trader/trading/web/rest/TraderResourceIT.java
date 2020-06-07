@@ -144,6 +144,10 @@ public class TraderResourceIT {
         int databaseSizeBeforeCreate = traderRepository.findAll().size();
         // Create the Trader
         TraderDTO traderDTO = traderMapper.toDto(trader);
+        traderDTO.setApiKey(DEFAULT_API_KEY);
+        traderDTO.setApiSecret(DEFAULT_API_SECRET);
+
+        // Perform REST request
         restTraderMockMvc.perform(post("/api/traders").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(traderDTO)))
@@ -161,8 +165,8 @@ public class TraderResourceIT {
         assertThat(testTrader.getStrategy()).isEqualTo(DEFAULT_STRATEGY);
         assertThat(testTrader.getApiKey()).isEqualTo(DEFAULT_API_KEY);
         assertThat(testTrader.getApiSecret()).isEqualTo(DEFAULT_API_SECRET);
-        assertThat(testTrader.isIsLive()).isEqualTo(DEFAULT_IS_LIVE);
-        assertThat(testTrader.isIsIn()).isEqualTo(DEFAULT_IS_IN);
+        assertThat(testTrader.isLive()).isEqualTo(DEFAULT_IS_LIVE);
+        assertThat(testTrader.isIn()).isEqualTo(DEFAULT_IS_IN);
         assertThat(testTrader.getBudget()).isEqualTo(DEFAULT_BUDGET);
     }
 
@@ -304,7 +308,7 @@ public class TraderResourceIT {
     public void checkIsLiveIsRequired() throws Exception {
         int databaseSizeBeforeTest = traderRepository.findAll().size();
         // set the field null
-        trader.setIsLive(null);
+        trader.setLive(null);
 
         // Create the Trader, which fails.
         TraderDTO traderDTO = traderMapper.toDto(trader);
@@ -323,7 +327,7 @@ public class TraderResourceIT {
     public void checkIsInIsRequired() throws Exception {
         int databaseSizeBeforeTest = traderRepository.findAll().size();
         // set the field null
-        trader.setIsIn(null);
+        trader.setIn(null);
 
         // Create the Trader, which fails.
         TraderDTO traderDTO = traderMapper.toDto(trader);
@@ -373,11 +377,11 @@ public class TraderResourceIT {
             .andExpect(jsonPath("$.[*].symbol").value(hasItem(DEFAULT_SYMBOL.toString())))
             .andExpect(jsonPath("$.[*].interval").value(hasItem(DEFAULT_INTERVAL.toString())))
             .andExpect(jsonPath("$.[*].strategy").value(hasItem(DEFAULT_STRATEGY.toString())))
-            .andExpect(jsonPath("$.[*].apiKey").value(hasItem(DEFAULT_API_KEY)))
-            .andExpect(jsonPath("$.[*].apiSecret").value(hasItem(DEFAULT_API_SECRET)))
-            .andExpect(jsonPath("$.[*].isLive").value(hasItem(DEFAULT_IS_LIVE.booleanValue()))) // TODO test that not published/exists
-            .andExpect(jsonPath("$.[*].isIn").value(hasItem(DEFAULT_IS_IN.booleanValue()))) // TODO test that not published/exists
-            .andExpect(jsonPath("$.[*].budget").value(hasItem(DEFAULT_BUDGET.doubleValue())));
+            .andExpect(jsonPath("$.apiKey").doesNotExist())
+            .andExpect(jsonPath("$.apiSecret").doesNotExist())
+            .andExpect(jsonPath("$.[*].live").value(hasItem(DEFAULT_IS_LIVE)))
+            .andExpect(jsonPath("$.[*].in").value(hasItem(DEFAULT_IS_IN)))
+            .andExpect(jsonPath("$.[*].budget").value(hasItem(DEFAULT_BUDGET)));
     }
 
     @Test
@@ -396,11 +400,11 @@ public class TraderResourceIT {
             .andExpect(jsonPath("$.symbol").value(DEFAULT_SYMBOL.toString()))
             .andExpect(jsonPath("$.interval").value(DEFAULT_INTERVAL.toString()))
             .andExpect(jsonPath("$.strategy").value(DEFAULT_STRATEGY.toString()))
-            .andExpect(jsonPath("$.apiKey").value(DEFAULT_API_KEY)) // TODO test that not published/exists
-            .andExpect(jsonPath("$.apiSecret").value(DEFAULT_API_SECRET)) // TODO test that not published/exists
-            .andExpect(jsonPath("$.isLive").value(DEFAULT_IS_LIVE.booleanValue()))
-            .andExpect(jsonPath("$.isIn").value(DEFAULT_IS_IN.booleanValue()))
-            .andExpect(jsonPath("$.budget").value(DEFAULT_BUDGET.doubleValue()));
+            .andExpect(jsonPath("$.apiKey").doesNotExist())
+            .andExpect(jsonPath("$.apiSecret").doesNotExist())
+            .andExpect(jsonPath("$.live").value(DEFAULT_IS_LIVE))
+            .andExpect(jsonPath("$.in").value(DEFAULT_IS_IN))
+            .andExpect(jsonPath("$.budget").value(DEFAULT_BUDGET));
     }
 
     @Test
@@ -435,6 +439,8 @@ public class TraderResourceIT {
             .isIn(UPDATED_IS_IN)
             .budget(UPDATED_BUDGET);
         TraderDTO traderDTO = traderMapper.toDto(updatedTrader);
+        traderDTO.setApiKey(UPDATED_API_KEY);
+        traderDTO.setApiSecret(UPDATED_API_SECRET);
 
         restTraderMockMvc.perform(put("/api/traders").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
@@ -453,8 +459,8 @@ public class TraderResourceIT {
         assertThat(testTrader.getStrategy()).isEqualTo(UPDATED_STRATEGY);
         assertThat(testTrader.getApiKey()).isEqualTo(UPDATED_API_KEY);
         assertThat(testTrader.getApiSecret()).isEqualTo(UPDATED_API_SECRET);
-        assertThat(testTrader.isIsLive()).isEqualTo(UPDATED_IS_LIVE);
-        assertThat(testTrader.isIsIn()).isEqualTo(UPDATED_IS_IN);
+        assertThat(testTrader.isLive()).isEqualTo(UPDATED_IS_LIVE);
+        assertThat(testTrader.isIn()).isEqualTo(UPDATED_IS_IN);
         assertThat(testTrader.getBudget()).isEqualTo(UPDATED_BUDGET);
     }
 

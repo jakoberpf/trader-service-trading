@@ -9,7 +9,7 @@ public class SignalPublisher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SignalPublisher.class);
 
-    private final MBassador<Signal> bus;
+    private final MBassador<SignalMessage> bus;
 
     /**
      * TODO
@@ -39,25 +39,24 @@ public class SignalPublisher {
     }
 
     /**
-     * @param signal
-     * @param aync
+     * @param signalMessage
+     * @param async
      * @return
      */
-    public void publishSignal(Signal signal, boolean aync) {
-        LOGGER.debug("Publishing signal: " + signal);
-        if (aync) {
-            this.bus.post(signal).asynchronously();
+    public void publishSignal(SignalMessage signalMessage, boolean async) {
+        LOGGER.debug("Publishing {} for {} {} {} {}", signalMessage.getSignal(), signalMessage.getMarket(), signalMessage.getSymbol(), signalMessage.getInterval(), signalMessage.getStrategy());
+        if (async) {
+            this.bus.post(signalMessage).asynchronously();
         } else {
-            this.publishSignal(signal);
+            this.publishSignal(signalMessage);
         }
     }
 
     /**
-     * @param signal
+     * @param signalMessage
      * @return
      */
-    public void publishSignal(Signal signal) {
-        LOGGER.debug("Publishing signal: " + signal);
-        this.bus.post(signal).now();
+    private void publishSignal(SignalMessage signalMessage) {
+        this.bus.post(signalMessage).now();
     }
 }

@@ -1,11 +1,9 @@
 package de.ginisolutions.trader.trading.domain;
 
-import de.ginisolutions.trader.common.strategy.parameter.StrategyParameter;
 import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
 import de.ginisolutions.trader.history.domain.enumeration.MARKET;
 import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
 import de.ginisolutions.trader.trading.domain.enumeration.STRATEGY;
-import de.ginisolutions.trader.trading.messaging.Signal;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -46,7 +44,6 @@ public class Trader implements Serializable {
     @Field("interval")
     private INTERVAL interval;
 
-    // TODO include parameters in strategy, so that strategy is the single identifier for an stragegy
     @NotNull
     @Field("strategy")
     private STRATEGY strategy; // TODO implement list of strategies for listening to multiple strategies
@@ -71,9 +68,6 @@ public class Trader implements Serializable {
     @Field("budget")
     private Double budget;
 
-    @Field("signalHistory")
-    private List<Signal> signalHistory;
-
     @Field("tradeHistory")
     private List<Trade> tradeHistory;
 
@@ -81,6 +75,11 @@ public class Trader implements Serializable {
 
     public String getId() {
         return id;
+    }
+
+    public Trader id(String id) {
+        this.id = id;
+        return this;
     }
 
     public void setId(String id) {
@@ -191,8 +190,7 @@ public class Trader implements Serializable {
         this.apiSecret = apiSecret;
     }
 
-    // TODO rework to isLive() and isLive(boolean)
-    public Boolean isIsLive() {
+    public Boolean isLive() {
         return isLive;
     }
 
@@ -201,12 +199,11 @@ public class Trader implements Serializable {
         return this;
     }
 
-    public void setIsLive(Boolean isLive) {
+    public void setLive(Boolean isLive) {
         this.isLive = isLive;
     }
 
-    // TODO rework to isIn() and isIn(boolean)
-    public Boolean isIsIn() {
+    public Boolean isIn() {
         return isIn;
     }
 
@@ -215,7 +212,7 @@ public class Trader implements Serializable {
         return this;
     }
 
-    public void setIsIn(Boolean isIn) {
+    public void setIn(Boolean isIn) {
         this.isIn = isIn;
     }
 
@@ -230,16 +227,6 @@ public class Trader implements Serializable {
 
     public void setBudget(Double budget) {
         this.budget = budget;
-    }
-
-    public List<Signal> getSignalHistory() {
-        return signalHistory;
-    }
-
-    // TODO add signalHistory()
-
-    public void setSignalHistory(List<Signal> signalHistory) {
-        this.signalHistory = signalHistory;
     }
 
     public List<Trade> getTradeHistory() {
@@ -279,8 +266,8 @@ public class Trader implements Serializable {
                 ", symbol='" + getSymbol() + "'" +
                 ", apiKey='" + getApiKey() + "'" +
                 ", apiSecret='" + getApiSecret() + "'" +
-                ", isLive='" + isIsLive() + "'" +
-                ", isIn='" + isIsIn() + "'" +
+                ", isLive='" + isLive() + "'" +
+                ", isIn='" + isIn() + "'" +
                 ", budget=" + getBudget() +
                 "}";
     }

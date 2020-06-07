@@ -1,15 +1,15 @@
 package de.ginisolutions.trader.trading.service.dto;
 
-import de.ginisolutions.trader.common.strategy.parameter.StrategyParameter;
 import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
 import de.ginisolutions.trader.history.domain.enumeration.MARKET;
 import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
+import de.ginisolutions.trader.trading.domain.Trade;
 import de.ginisolutions.trader.trading.domain.enumeration.STRATEGY;
 import io.swagger.annotations.ApiModel;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.*;
 import java.io.Serializable;
+import java.util.List;
 
 
 /**
@@ -38,11 +38,9 @@ public class TraderDTO implements Serializable {
     @NotNull
     private STRATEGY strategy;
 
-    @NotNull
-    private String apiKey; // TODO receive, but dont publish
+    private String apiKey;
 
-    @NotNull
-    private String apiSecret; // TODO receive, but dont publish
+    private String apiSecret;
 
     @NotNull
     private Boolean isLive;
@@ -53,6 +51,7 @@ public class TraderDTO implements Serializable {
     @NotNull
     private Double budget;
 
+    private List<Trade> tradeHistory;
 
     public String getId() {
         return id;
@@ -126,19 +125,19 @@ public class TraderDTO implements Serializable {
         this.apiSecret = apiSecret;
     }
 
-    public Boolean isIsLive() {
+    public Boolean isLive() {
         return isLive;
     }
 
-    public void setIsLive(Boolean isLive) {
+    public void setLive(Boolean isLive) {
         this.isLive = isLive;
     }
 
-    public Boolean isIsIn() {
+    public Boolean isIn() {
         return isIn;
     }
 
-    public void setIsIn(Boolean isIn) {
+    public void setIn(Boolean isIn) {
         this.isIn = isIn;
     }
 
@@ -148,6 +147,14 @@ public class TraderDTO implements Serializable {
 
     public void setBudget(Double budget) {
         this.budget = budget;
+    }
+
+    public List<Trade> getTradeHistory() {
+        return tradeHistory;
+    }
+
+    public void setTradeHistory(List<Trade> tradeHistory) {
+        this.tradeHistory = tradeHistory;
     }
 
     @Override
@@ -178,8 +185,8 @@ public class TraderDTO implements Serializable {
             ", symbol='" + getSymbol() + "'" +
             ", apiKey='" + getApiKey() + "'" +
             ", apiSecret='" + getApiSecret() + "'" +
-            ", isLive='" + isIsLive() + "'" +
-            ", isIn='" + isIsIn() + "'" +
+            ", isLive='" + isLive() + "'" +
+            ", isIn='" + isIn() + "'" +
             ", budget=" + getBudget() +
             "}";
     }

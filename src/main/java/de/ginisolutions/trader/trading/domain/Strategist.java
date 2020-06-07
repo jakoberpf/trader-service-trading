@@ -8,7 +8,10 @@ import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.ta4j.core.BaseTradingRecord;
+import org.ta4j.core.TradingRecord;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -37,6 +40,9 @@ public class Strategist implements Serializable {
     @Field("parameters")
     private StrategyParameter parameters;
 
+    @Field("tradingRecord")
+    private TradingRecord tradingRecord;
+
     public Strategist() {
     }
 
@@ -46,6 +52,7 @@ public class Strategist implements Serializable {
         this.symbol = symbol;
         this.interval = interval;
         this.parameters = parameters;
+        this.tradingRecord = new BaseTradingRecord();
     }
 
     public String getId() {
@@ -119,6 +126,19 @@ public class Strategist implements Serializable {
     public Strategist parameters(StrategyParameter parameters) {
         this.parameters = parameters;
         return this;
+    }
+
+    public TradingRecord getTradingRecord() {
+        return tradingRecord;
+    }
+
+    public Strategist tradingRecord(TradingRecord tradingRecord) {
+        this.tradingRecord = tradingRecord;
+        return this;
+    }
+
+    public void setTradingRecord(TradingRecord tradingRecord) {
+        this.tradingRecord = tradingRecord;
     }
 
     @Override

@@ -5,6 +5,7 @@ import de.ginisolutions.trader.trading.domain.Trader;
 import de.ginisolutions.trader.trading.domain.TraderPackage;
 import de.ginisolutions.trader.trading.event.TradingInit;
 import de.ginisolutions.trader.trading.repository.TraderRepository;
+import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -107,7 +108,7 @@ public class TraderManager {
             this.strategistManager.unsubscribe(traderPackage.getTrader().getMarket(), traderPackage.getTrader().getSymbol(), traderPackage.getTrader().getInterval(), traderPackage.getTrader().getStrategy(), traderPackage);
             this.traderPackageList.remove(traderPackage);
         }, () -> {
-            throw new IllegalArgumentException("Trader to edit not found");
+            throw new RuntimeException("Trader to edit not found");
         });
         // add updated package
         final TraderPackage newTraderPackage = new TraderPackage(trader,

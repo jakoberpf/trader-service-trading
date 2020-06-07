@@ -15,9 +15,9 @@
 
 logging:
   level:
-    ROOT: DEBUG
-    io.github.jhipster: DEBUG
-    de.ginisolutions.trader.trading: DEBUG
+    ROOT: INFO
+    io.github.jhipster: INFO
+    de.ginisolutions.trader.trading: INFO
 
 eureka:
   instance:

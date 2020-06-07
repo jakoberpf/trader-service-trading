@@ -46,6 +46,9 @@ public class TraderService {
         if (traderDTO.getId() != null) {
             throw new IllegalArgumentException("A new trader cannot already have an ID");
         }
+        if (traderDTO.getTradeHistory() != null) {
+            throw new IllegalArgumentException("A new trader cannot already have a trader history");
+        }
         Trader trader = traderMapper.toEntity(traderDTO);
         trader = this.traderManager.add(trader);
         return traderMapper.toDto(trader);
@@ -62,7 +65,19 @@ public class TraderService {
         if (traderDTO.getId() == null) {
             throw new IllegalArgumentException("A trader must have a ID to be updated");
         }
+        if (traderDTO.getTradeHistory() != null) {
+            throw new IllegalArgumentException("A traders history can not be updated");
+        }
         Trader trader = traderMapper.toEntity(traderDTO);
+        if (trader.getApiKey() == null || trader.getApiSecret() == null) {
+            final Optional<Trader> traderFromRepo = this.traderRepository.findById(trader.getId());
+            if (traderFromRepo.isPresent()) {
+                trader.setApiKey(traderFromRepo.get().getApiKey());
+                trader.setApiSecret(traderFromRepo.get().getApiSecret());
+            } else {
+                throw new RuntimeException("Trader to update not found");
+            }
+        }
         trader = this.traderManager.edit(trader);
         return traderMapper.toDto(trader);
     }
