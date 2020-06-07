@@ -1,20 +1,17 @@
 package de.ginisolutions.trader.trading.management;
 
-import de.ginisolutions.trader.common.market.AccountImplFactory;
 import de.ginisolutions.trader.trading.domain.Trader;
 import de.ginisolutions.trader.trading.domain.TraderPackage;
-import de.ginisolutions.trader.trading.event.TradingInit;
 import de.ginisolutions.trader.trading.repository.TraderRepository;
-import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * TODO
@@ -47,8 +44,7 @@ public class TraderManager {
         LOGGER.info("Initializing TraderManager");
         traderRepository.findAll().forEach(trader -> {
             LOGGER.debug("Initializing Trader: {}", trader);
-            final TraderPackage newTraderPackage = new TraderPackage(trader,
-                AccountImplFactory.buildAccount(trader.getMarket(), trader.getApiKey(), trader.getApiSecret()));
+            final TraderPackage newTraderPackage = new TraderPackage(trader);
             this.strategistManager.subscribe(trader.getMarket(), trader.getSymbol(), trader.getInterval(), trader.getStrategy(), newTraderPackage);
             this.traderPackageList.add(newTraderPackage);
         });
@@ -78,15 +74,9 @@ public class TraderManager {
         // persist trader
         trader = this.traderRepository.save(trader);
         // add package
-//        try {
-        final TraderPackage newTraderPackage = new TraderPackage(trader,
-            AccountImplFactory.buildAccount(trader.getMarket(), trader.getApiKey(), trader.getApiSecret()));
+        final TraderPackage newTraderPackage = new TraderPackage(trader);
         this.strategistManager.subscribe(trader.getMarket(), trader.getSymbol(), trader.getInterval(), trader.getStrategy(), newTraderPackage);
         this.traderPackageList.add(newTraderPackage);
-//        } catch (Exception exception) {
-//            this.traderRepository.delete(trader);
-//            throw new RuntimeException("Unable to add trader, rolling back repository", exception);
-//        }
         LOGGER.debug("Adding Trader successful: {}", trader);
         return trader;
     }
@@ -111,8 +101,7 @@ public class TraderManager {
             throw new RuntimeException("Trader to edit not found");
         });
         // add updated package
-        final TraderPackage newTraderPackage = new TraderPackage(trader,
-            AccountImplFactory.buildAccount(trader.getMarket(), trader.getApiKey(), trader.getApiSecret()));
+        final TraderPackage newTraderPackage = new TraderPackage(trader);
         this.strategistManager.subscribe(trader.getMarket(), trader.getSymbol(), trader.getInterval(), trader.getStrategy(), newTraderPackage);
         this.traderPackageList.add(newTraderPackage);
         // persist trader
@@ -122,18 +111,30 @@ public class TraderManager {
     }
 
     /**
-     * @param trader
+     * @param id
      * @return
      */
-    public Trader remove(Trader trader) {
-        LOGGER.debug("Removing Trader : {}", trader);
+    public Trader get(String id) {
+        final Optional<TraderPackage> optional = this.traderPackageList.stream().filter(traderPackage ->
+            traderPackage.getTrader().getId().equals(id)).findAny();
+        if (optional.isEmpty()) {
+            throw new RuntimeException("Trader not found");
+        }
+        return optional.get().getTrader();
+    }
+
+    /**
+     * @param id
+     * @return
+     */
+    public String remove(String id) {
+        LOGGER.debug("Removing Trader : {}", id);
         // remove package
-        Trader current = trader;
         this.traderPackageList.stream().filter(traderPackage ->
-            traderPackage.getTrader().getId().equals(current.getId())).findFirst().ifPresent(this.traderPackageList::remove);
+            traderPackage.getTrader().getId().equals(id)).findFirst().ifPresent(this.traderPackageList::remove);
         // truncate
-        this.traderRepository.delete(trader);
-        return trader;
+        this.traderRepository.deleteById(id);
+        return id;
     }
 
     /**

@@ -29,7 +29,7 @@ public class TraderPackage implements SignalListener {
     @NotNull
     private final AccountImpl accountImpl;
 
-    public TraderPackage(@NotNull Trader trader, @NotNull AccountImpl accountImpl) {
+    public TraderPackage(@NotNull Trader trader) {
         this.trader = trader;
         this.accountImpl = AccountImplFactory.buildAccount(trader.getMarket(), trader.getApiKey(), trader.getApiSecret());
     }
@@ -39,7 +39,7 @@ public class TraderPackage implements SignalListener {
      * @param signalMessage
      */
     @Handler
-    private void handleSignal(@NotNull SignalMessage signalMessage) {
+    private void handleSignal(SignalMessage signalMessage) {
         LOGGER.warn("Got SIGNAL");
         if (signalMessage.getSignal().equals(ENTER)) {
             LOGGER.warn("Got ENTER");

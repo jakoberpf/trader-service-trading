@@ -1,6 +1,9 @@
 package de.ginisolutions.trader.trading.web.rest;
 
 import de.ginisolutions.trader.trading.service.TraderService;
+import de.ginisolutions.trader.trading.service.dto.TraderPOST;
+import de.ginisolutions.trader.trading.service.dto.TraderGET;
+import de.ginisolutions.trader.trading.service.dto.TraderPUT;
 import de.ginisolutions.trader.trading.web.rest.errors.BadRequestAlertException;
 import de.ginisolutions.trader.trading.service.dto.TraderDTO;
 
@@ -46,17 +49,14 @@ public class TraderResource {
     /**
      * {@code POST  /traders} : Create a new trader.
      *
-     * @param traderDTO the traderDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new traderDTO, or with status {@code 400 (Bad Request)} if the trader has already an ID.
+     * @param traderPOST the trader to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new trader, or with status {@code 400 (Bad Request)} if the trader has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/traders")
-    public ResponseEntity<TraderDTO> createTrader(@Valid @RequestBody TraderDTO traderDTO) throws URISyntaxException {
-        LOGGER.debug("REST request to save Trader : {}", traderDTO);
-        if (traderDTO.getId() != null) {
-            throw new BadRequestAlertException("A new trader cannot already have an ID", ENTITY_NAME, "idexists");
-        }
-        TraderDTO result = traderService.create(traderDTO);
+    public ResponseEntity<TraderGET> createTrader(@Valid @RequestBody TraderPOST traderPOST) throws URISyntaxException {
+        LOGGER.debug("REST request to save Trader : {}", traderPOST);
+        TraderGET result = traderService.create(traderPOST);
         return ResponseEntity.created(new URI("/api/traders/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId()))
             .body(result);
@@ -65,21 +65,21 @@ public class TraderResource {
     /**
      * {@code PUT  /traders} : Updates an existing trader.
      *
-     * @param traderDTO the traderDTO to update.
+     * @param traderPUT the trader to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated traderDTO,
-     * or with status {@code 400 (Bad Request)} if the traderDTO is not valid,
+     * or with status {@code 400 (Bad Request)} if the trader is not valid,
      * or with status {@code 500 (Internal Server Error)} if the traderDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/traders")
-    public ResponseEntity<TraderDTO> updateTrader(@Valid @RequestBody TraderDTO traderDTO) throws URISyntaxException {
-        LOGGER.debug("REST request to update Trader : {}", traderDTO);
-        if (traderDTO.getId() == null) {
+    public ResponseEntity<TraderGET> updateTrader(@Valid @RequestBody TraderPUT traderPUT) throws URISyntaxException {
+        LOGGER.debug("REST request to update Trader : {}", traderPUT);
+        if (traderPUT.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        TraderDTO result = traderService.update(traderDTO);
+        TraderGET result = traderService.update(traderPUT);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, traderDTO.getId()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, traderPUT.getId()))
             .body(result);
     }
 
@@ -89,7 +89,7 @@ public class TraderResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of traders in body.
      */
     @GetMapping("/traders")
-    public List<TraderDTO> getAllTraders() {
+    public List<TraderGET> getAllTraders() {
         LOGGER.debug("REST request to get all Traders");
         return traderService.findAll();
     }
@@ -101,10 +101,10 @@ public class TraderResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the traderDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/traders/{id}")
-    public ResponseEntity<TraderDTO> getTrader(@PathVariable String id) {
+    public ResponseEntity<TraderGET> getTrader(@PathVariable String id) {
         LOGGER.debug("REST request to get Trader : {}", id);
-        Optional<TraderDTO> traderDTO = traderService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(traderDTO);
+        Optional<TraderGET> traderGET = traderService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(traderGET);
     }
 
     /**

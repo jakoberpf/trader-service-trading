@@ -10,13 +10,11 @@ import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
 import de.ginisolutions.trader.trading.domain.Strategist;
 import de.ginisolutions.trader.trading.domain.StrategistPackage;
 import de.ginisolutions.trader.trading.domain.enumeration.STRATEGY;
-import de.ginisolutions.trader.trading.event.TradingInit;
 import de.ginisolutions.trader.trading.messaging.SignalListener;
 import de.ginisolutions.trader.trading.repository.StrategistRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -126,10 +124,14 @@ public class StrategistManager {
             // strategist is already present -> subscribe to it
             strategistPackage.subscribe(listener);
         } else {
-            // create a new strategist, subscribe to it and save it in new list
+            // create a new strategist with package
             final Strategist strategist = this.strategistRepository.save(new Strategist(strategy, market, symbol, interval, parameters));
             final StrategistPackage newStrategistPackage = new StrategistPackage(strategist, this.historyProvider);
+            // subscribe strategist to crawler
             this.historyManager.subscribe2crawler(strategist.getMarket(), strategist.getSymbol(), strategist.getInterval(), newStrategistPackage);
+            // subscribe listener to strategist
+            newStrategistPackage.subscribe(listener);
+            // save strategist in map;
             this.strategistMap.put(key, newStrategistPackage);
             LOGGER.info("Created new strategist: " + strategist);
         }

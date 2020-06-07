@@ -1,12 +1,10 @@
 package de.ginisolutions.trader.trading.service.mapper;
 
 
-import de.ginisolutions.trader.trading.domain.*;
+import de.ginisolutions.trader.trading.domain.Trader;
 import de.ginisolutions.trader.trading.service.dto.TraderDTO;
-
-import org.mapstruct.*;
-
-import java.util.List;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * Mapper for the entity {@link Trader} and its DTO {@link TraderDTO}.

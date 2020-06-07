@@ -114,6 +114,7 @@ public class TraderMapperTest {
         traderDTO.setLive(CREATE_IS_LIVE);
         traderDTO.setIn(CREATE_IS_IN);
         traderDTO.setBudget(CREATE_BUDGET);
+        traderDTO.setTradeHistory(new ArrayList<>());
         return traderDTO;
     }
 
@@ -137,6 +138,7 @@ public class TraderMapperTest {
         traderDTO.setLive(UPDATE_IS_LIVE);
         traderDTO.setIn(UPDATE_IS_IN);
         traderDTO.setBudget(UPDATE_BUDGET);
+        traderDTO.setTradeHistory(new ArrayList<>());
         return traderDTO;
     }
 
@@ -202,6 +204,6 @@ public class TraderMapperTest {
         assertThat(traderDTO.isLive()).isEqualTo(ENTITY_IS_LIVE);
         assertThat(traderDTO.isIn()).isEqualTo(ENTITY_IS_IN);
         assertThat(traderDTO.getBudget()).isEqualTo(ENTITY_BUDGET);
-//        assertThat(traderDTO.getTradeHistory()).isNot(null);
+        assertThat(trader.getTradeHistory()).isNotNull();
     }
 }
