@@ -1,5 +1,6 @@
 package de.ginisolutions.trader.trading.domain;
 
+import com.bol.secure.Encrypted;
 import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
 import de.ginisolutions.trader.history.domain.enumeration.MARKET;
 import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
@@ -29,6 +30,7 @@ public class Trader implements Serializable {
     private String name;
 
     @NotNull
+    @Encrypted
     @Field("owner")
     private String owner;
 
@@ -49,10 +51,12 @@ public class Trader implements Serializable {
     private STRATEGY strategy; // TODO implement list of strategies for listening to multiple strategies
 
     @NotNull
+    @Encrypted
     @Field("api_key")
     private String apiKey;
 
     @NotNull
+    @Encrypted
     @Field("api_secret")
     private String apiSecret;
 
