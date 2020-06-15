@@ -20,22 +20,16 @@ public class TraderPUT {
     @NotNull
     private String owner;
 
-    @NotNull
     private STRATEGY strategy;
 
-    @NotNull
     private String apiKey;
 
-    @NotNull
     private String apiSecret;
 
-    @NotNull
     private Boolean isLive;
 
-    @NotNull
     private Boolean isIn;
 
-    @NotNull
     private Double budget;
 
     public String getId() {

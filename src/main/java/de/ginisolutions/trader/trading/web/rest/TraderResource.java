@@ -77,6 +77,12 @@ public class TraderResource {
         if (traderPUT.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+        if (traderPUT.getApiKey() == null && traderPUT.getApiSecret() != null) {
+            throw new BadRequestAlertException("Invalid ApiKeyPair", ENTITY_NAME, "apisecretnull");
+        }
+        if (traderPUT.getApiKey() != null && traderPUT.getApiSecret() == null) {
+            throw new BadRequestAlertException("Invalid ApiKeyPair", ENTITY_NAME, "apikeynull");
+        }
         TraderGET result = traderService.update(traderPUT);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, traderPUT.getId()))

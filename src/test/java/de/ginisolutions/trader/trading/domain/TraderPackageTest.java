@@ -1,11 +1,11 @@
-//package de.ginisolutions.trader.trading.domain;
-//
-//import org.junit.jupiter.api.Test;
-//import static org.assertj.core.api.Assertions.assertThat;
-//import de.ginisolutions.trader.trading.web.rest.TestUtil;
-//
-//public class TraderPackageTest {
-//
+package de.ginisolutions.trader.trading.domain;
+
+import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import de.ginisolutions.trader.trading.web.rest.TestUtil;
+
+public class TraderPackageTest {
+
 //    @Test
 //    public void equalsVerifier() throws Exception {
 //        TestUtil.equalsVerifier(TraderPackage.class);
@@ -19,4 +19,7 @@
 //        traderPackage1.setId(null);
 //        assertThat(traderPackage1).isNotEqualTo(traderPackage2);
 //    }
-//}
+//
+//    @Test
+//    public void
+}

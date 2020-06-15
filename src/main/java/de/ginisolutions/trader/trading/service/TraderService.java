@@ -53,12 +53,12 @@ public class TraderService {
     /**
      * Create a trader.
      *
-     * @param traderPOST the trader to create.
+     * @param dto the trader to create.
      * @return the persisted entity.
      */
-    public TraderGET create(TraderPOST traderPOST) {
-        LOGGER.debug("Request to create Trader : {}", traderPOST);
-        Trader trader = traderMapperPOST.toEntity(traderPOST);
+    public TraderGET create(TraderPOST dto) {
+        LOGGER.debug("Request to create Trader : {}", dto);
+        Trader trader = traderMapperPOST.toEntity(dto);
         trader = this.traderManager.add(trader);
         return traderMapperGET.toDto(trader);
     }
@@ -66,22 +66,31 @@ public class TraderService {
     /**
      * Create a trader.
      *
-     * @param traderPUT the trader to create.
+     * @param dto the trader to create.
      * @return the persisted entity.
      */
-    public TraderGET update(TraderPUT traderPUT) {
-        LOGGER.debug("Request to update Trader : {}", traderPUT);
-        Trader trader = traderMapperPUT.toEntity(traderPUT);
-        final Trader traderFromRepo = this.traderManager.get(traderPUT.getId());
-        trader.setMarket(traderFromRepo.getMarket());
-        trader.setSymbol(traderFromRepo.getSymbol());
-        trader.setInterval(traderFromRepo.getInterval());
-        trader.setTradeHistory(traderFromRepo.getTradeHistory());
-        if (trader.getApiKey().isEmpty() || trader.getApiSecret().isEmpty()) {
-            trader.setApiKey(traderFromRepo.getApiKey());
-            trader.setApiSecret(traderFromRepo.getApiSecret());
+    public TraderGET update(TraderPUT dto) {
+        LOGGER.debug("Request to update Trader : {}", dto);
+        final Trader traderFromRepo = this.traderManager.get(dto.getId());
+        traderFromRepo.setName(dto.getName());
+        if (dto.getStrategy() != null) {
+            traderFromRepo.setStrategy(dto.getStrategy());
         }
-        trader = this.traderManager.edit(trader);
+        if (dto.getApiKey() != null && dto.getApiSecret() != null) {
+            // TODO throw BadRequestException in TraderResource
+            traderFromRepo.setApiKey(dto.getApiKey());
+            traderFromRepo.setApiSecret(dto.getApiSecret());
+        }
+        if (dto.getLive()  != null) {
+            traderFromRepo.setLive(dto.getLive());
+        }
+        if (dto.getIn() != null) {
+            traderFromRepo.setIn(dto.getIn());
+        }
+        if (dto.getBudget()  != null) {
+            traderFromRepo.setBudget(dto.getBudget());
+        }
+        Trader trader = this.traderManager.edit(traderFromRepo);
         return traderMapperGET.toDto(trader);
     }
 
