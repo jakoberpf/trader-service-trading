@@ -35,7 +35,6 @@
         <!-- These remain empty unless the corresponding profile is active -->
         <profile.swagger />
         <profile.tls />
-
         <!-- Dependency versions -->
         <jhipster-dependencies.version>3.7.1</jhipster-dependencies.version>
         <!-- The spring-boot version should match the one managed by
@@ -567,7 +566,7 @@
                             <image>adoptopenjdk:11-jre-hotspot</image>
                         </from>
                         <to>
-                            <image>traderservicetrading:latest</image>
+                            <image>ginisolutions/traderservicetrading:${project.version}</image>
                         </to>
                         <container>
                             <entrypoint>
