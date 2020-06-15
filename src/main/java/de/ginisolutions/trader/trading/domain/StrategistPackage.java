@@ -82,13 +82,13 @@ public class StrategistPackage implements TickListener {
         final int endIndex = this.barSeries.getEndIndex();
         if (strategy.shouldEnter(endIndex)) {
             LOGGER.debug("Strategy should ENTER");
-            this.strategist.getTradingRecord().enter(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000)); // TODO externalise value 1000 into application.properties
+//            this.strategist.getTradingRecord().enter(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000)); // TODO externalise value 1000 into application.properties
             this.publisher.publishSignal(new SignalMessage(SIGNAL.ENTER, strategist.getMarket(), strategist.getSymbol(), strategist.getInterval(), strategist.getStrategy()), false);
             // TODO add entry to strategist log
         }
         if (strategy.shouldExit(endIndex)) {
             LOGGER.debug("Strategy should EXIT");
-            this.strategist.getTradingRecord().exit(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000)); // TODO externalise value 1000 into application.properties
+//            this.strategist.getTradingRecord().exit(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000)); // TODO externalise value 1000 into application.properties
             this.publisher.publishSignal(new SignalMessage(SIGNAL.EXIT, strategist.getMarket(), strategist.getSymbol(), strategist.getInterval(), strategist.getStrategy()), false);
             // TODO add entry to strategist log
         }
