@@ -37,31 +37,41 @@ public class TraderPackage implements SignalListener {
     }
 
     /**
-     *
      * @param signalMessage
      */
     @Handler
+    @SuppressWarnings("unused")
     private void handleSignal(SignalMessage signalMessage) {
         LOGGER.warn("Got SIGNAL {}", signalMessage);
         if (trader.isLive()) {
             if (signalMessage.getSignal().equals(ENTER) && !trader.isIn()) {
-                LOGGER.warn("Got ENTER");
-                try {
-                    this.accountImpl.makeOrder(trader.getSymbol(), getTrader().getBudget(), BUY);
-                    this.trader.getTradeHistory().add(new Trade(LocalDateTime.now(), ENTER, BUY, 0D, trader.getBudget())); // TODO get price and quantity from OrderResponse
-                } catch (Exception e) {
-                    LOGGER.warn(e.getMessage());
-                    throw e;
+                LOGGER.info("Got ENTER");
+                if (!trader.isIn()) {
+                    try {
+                        this.accountImpl.makeOrder(trader.getSymbol(), getTrader().getBudget(), BUY);
+                        this.trader.getTradeHistory().add(new Trade(LocalDateTime.now(), ENTER, BUY, 0D, trader.getBudget())); // TODO get price and quantity from OrderResponse
+                    } catch (Exception e) {
+                        LOGGER.warn(e.getMessage());
+                        throw e;
+                    }
+                    trader.setIn(true);
+                } else {
+                    LOGGER.info("Trader already entered, no order will be placed");
                 }
             }
             if (signalMessage.getSignal().equals(EXIT) && trader.isIn()) {
-                LOGGER.warn("Got EXIT");
-                try {
-                    this.accountImpl.makeOrder(trader.getSymbol(), getTrader().getBudget(), SELL);
-                    this.trader.getTradeHistory().add(new Trade(LocalDateTime.now(), EXIT, SELL, 0D, trader.getBudget())); // TODO get price and quantity from OrderResponse
-                } catch (Exception e) {
-                    LOGGER.warn(e.getMessage());
-                    throw e;
+                LOGGER.info("Got EXIT");
+                if (trader.isIn()) {
+                    try {
+                        this.accountImpl.makeOrder(trader.getSymbol(), getTrader().getBudget(), SELL);
+                        this.trader.getTradeHistory().add(new Trade(LocalDateTime.now(), EXIT, SELL, 0D, trader.getBudget())); // TODO get price and quantity from OrderResponse
+                    } catch (Exception e) {
+                        LOGGER.warn(e.getMessage());
+                        throw e;
+                    }
+                    trader.setIn(false);
+                } else {
+                    LOGGER.info("Trader already exited, no order will be placed");
                 }
             }
         }

@@ -2,7 +2,7 @@ package de.ginisolutions.trader.trading.domain;
 
 import de.ginisolutions.trader.common.messaging.TickListener;
 import de.ginisolutions.trader.common.strategy.StrategyFactory;
-import de.ginisolutions.trader.history.domain.TickDTO;
+import de.ginisolutions.trader.history.domain.TickPackage;
 import de.ginisolutions.trader.trading.domain.enumeration.SIGNAL;
 import de.ginisolutions.trader.trading.messaging.SignalListener;
 import de.ginisolutions.trader.trading.messaging.SignalMessage;
@@ -39,33 +39,37 @@ public class StrategistPackage implements TickListener {
     @NotNull
     private final BarSeries barSeries;
 
+    @NotNull
+    private TradingRecord tradingRecord;
+
     public StrategistPackage(@NotNull Strategist strategist, @NotNull HistoryProvider historyProvider) {
         this.strategist = strategist;
         this.publisher = new SignalPublisher();
         this.barSeries = historyProvider.getInitialBarSeries(strategist.getMarket(), strategist.getSymbol(), strategist.getInterval());
+        this.tradingRecord = new BaseTradingRecord();
         this.strategy = StrategyFactory.buildStrategy(this.barSeries, strategist.getStrategy(), strategist.getParameters());
     }
 
     /**
-     * @param tickDTO
+     * @param tickPackage
      */
     @Handler
-    public void handleTick(TickDTO tickDTO) {
+    public void handleTick(TickPackage tickPackage) {
         LOGGER.debug("Received tick message");
-        if (tickDTO.getMarket().equals(this.strategist.getMarket()) &&
-            tickDTO.getSymbol().equals(this.strategist.getSymbol()) &&
-            tickDTO.getInterval().equals(this.strategist.getInterval())) {
-            if (ZonedDateTime.ofInstant(Instant.ofEpochMilli(tickDTO.getOpenTime()), ZoneId.systemDefault()).isAfter(this.barSeries.getLastBar().getEndTime())) {
+        if (tickPackage.getMarket().equals(this.strategist.getMarket()) &&
+            tickPackage.getSymbol().equals(this.strategist.getSymbol()) &&
+            tickPackage.getInterval().equals(this.strategist.getInterval())) {
+            if (ZonedDateTime.ofInstant(Instant.ofEpochMilli(tickPackage.getOpenTime()), ZoneId.systemDefault()).isAfter(this.barSeries.getLastBar().getEndTime())) {
                 this.barSeries.addBar(
-                    Duration.ofMillis(tickDTO.getInterval().getInterval() - 1),
-                    ZonedDateTime.ofInstant(Instant.ofEpochMilli(tickDTO.getCloseTime()), ZoneId.systemDefault()),
-                    tickDTO.getOpen(),
-                    tickDTO.getHigh(),
-                    tickDTO.getLow(),
-                    tickDTO.getClose(),
-                    tickDTO.getVolume()
+                    Duration.ofMillis(tickPackage.getInterval().getInterval() - 1),
+                    ZonedDateTime.ofInstant(Instant.ofEpochMilli(tickPackage.getCloseTime()), ZoneId.systemDefault()),
+                    tickPackage.getOpen(),
+                    tickPackage.getHigh(),
+                    tickPackage.getLow(),
+                    tickPackage.getClose(),
+                    tickPackage.getVolume()
                 );
-                LOGGER.info("Added tick to bar series -> " + tickDTO.toString());
+                LOGGER.info("Added tick to bar series -> " + tickPackage.toString());
                 this.decide();
             } else {
                 // TODO update last bar
@@ -82,15 +86,13 @@ public class StrategistPackage implements TickListener {
         final int endIndex = this.barSeries.getEndIndex();
         if (strategy.shouldEnter(endIndex)) {
             LOGGER.debug("Strategy should ENTER");
-//            this.strategist.getTradingRecord().enter(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000)); // TODO externalise value 1000 into application.properties
+            this.tradingRecord.enter(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000));
             this.publisher.publishSignal(new SignalMessage(SIGNAL.ENTER, strategist.getMarket(), strategist.getSymbol(), strategist.getInterval(), strategist.getStrategy()), false);
-            // TODO add entry to strategist log
         }
         if (strategy.shouldExit(endIndex)) {
             LOGGER.debug("Strategy should EXIT");
-//            this.strategist.getTradingRecord().exit(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000)); // TODO externalise value 1000 into application.properties
+            this.tradingRecord.exit(endIndex, newBar.getClosePrice(), PrecisionNum.valueOf(1000));
             this.publisher.publishSignal(new SignalMessage(SIGNAL.EXIT, strategist.getMarket(), strategist.getSymbol(), strategist.getInterval(), strategist.getStrategy()), false);
-            // TODO add entry to strategist log
         }
     }
 

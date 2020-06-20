@@ -75,8 +75,6 @@ public class Trader implements Serializable {
     @Field("tradeHistory")
     private List<Trade> tradeHistory;
 
-    // TODO implement trading record if serializable
-
     public String getId() {
         return id;
     }

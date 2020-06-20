@@ -2,7 +2,7 @@ package de.ginisolutions.trader.trading.management;
 
 import de.ginisolutions.trader.common.market.MarketImpl;
 import de.ginisolutions.trader.common.market.MarketImplFactory;
-import de.ginisolutions.trader.history.domain.TickDTO;
+import de.ginisolutions.trader.history.domain.TickPackage;
 import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
 import de.ginisolutions.trader.history.domain.enumeration.MARKET;
 import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
@@ -48,7 +48,7 @@ public class HistoryProvider {
     public BarSeries getBarSeries(final MARKET market, final SYMBOL symbol, final INTERVAL interval, final int maxLength) {
         LOGGER.debug("Building bar series for {} {} {} with max length {}", market, symbol, interval, maxLength);
         // get tick from database or market
-        final List<TickDTO> ticks = this.getTickList(market, symbol, interval);
+        final List<TickPackage> ticks = this.getTickList(market, symbol, interval);
         // convert ticks to bar series and return
         return this.convertTickListBarSeries(market, symbol, ticks);
     }
@@ -63,7 +63,7 @@ public class HistoryProvider {
      * @param interval defines the time interval
      * @return a list of ticks
      */
-    public List<TickDTO> getTickList(MARKET market, SYMBOL symbol, INTERVAL interval) {
+    public List<TickPackage> getTickList(MARKET market, SYMBOL symbol, INTERVAL interval) {
         LOGGER.debug("Requesting ticks from {} for {} {}", market, symbol, interval);
         switch (market) {
             case BINANCE:
@@ -82,13 +82,13 @@ public class HistoryProvider {
      * @param ticks a list of ticks
      * @return BarSeries from the ticks and with the name of the market and symbol
      */
-    public BarSeries convertTickListBarSeries(final MARKET market, final SYMBOL symbol, final List<TickDTO> ticks) {
+    public BarSeries convertTickListBarSeries(final MARKET market, final SYMBOL symbol, final List<TickPackage> ticks) {
         LOGGER.debug("Converting tick list to bar series");
         BarSeries barSeries = new BaseBarSeriesBuilder()
             .withName(market.getName() + "-" + symbol.getNameUpper())
             .withNumTypeOf(PrecisionNum.class)
             .build();
-        for (TickDTO tick : ticks) {
+        for (TickPackage tick : ticks) {
             barSeries.addBar(
                 Duration.ofMillis(tick.getInterval().getInterval() - 1),
                 ZonedDateTime.ofInstant(Instant.ofEpochMilli(tick.getCloseTime()), ZoneId.systemDefault()),

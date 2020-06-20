@@ -1,7 +1,7 @@
 package de.ginisolutions.trader.trading.management;
 
 import de.ginisolutions.trader.common.messaging.TickListener;
-import de.ginisolutions.trader.history.domain.TickDTO;
+import de.ginisolutions.trader.history.domain.TickPackage;
 import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
 import de.ginisolutions.trader.history.domain.enumeration.MARKET;
 import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
@@ -31,7 +31,7 @@ public class HistoryManagerTest implements TickListener {
     @Autowired
     private HistoryManager historyManager;
 
-    private TickDTO tickReceived;
+    private TickPackage tickReceived;
 
     @BeforeEach
     public void initTest() {
@@ -50,8 +50,8 @@ public class HistoryManagerTest implements TickListener {
     }
 
     @Handler
-    public void handleTick(TickDTO tickDTO) {
-        this.tickReceived = tickDTO;
+    public void handleTick(TickPackage tickPackage) {
+        this.tickReceived = tickPackage;
     }
 
 }

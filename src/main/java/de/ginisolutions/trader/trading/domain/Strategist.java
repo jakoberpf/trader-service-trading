@@ -40,9 +40,6 @@ public class Strategist implements Serializable {
     @Field("parameters")
     private StrategyParameter parameters;
 
-//    @Field("tradingRecord")
-//    private TradingRecord tradingRecord;
-
     public Strategist() {
     }
 
@@ -52,7 +49,6 @@ public class Strategist implements Serializable {
         this.symbol = symbol;
         this.interval = interval;
         this.parameters = parameters;
-//        this.tradingRecord = new BaseTradingRecord();
     }
 
     public String getId() {
@@ -127,19 +123,6 @@ public class Strategist implements Serializable {
         this.parameters = parameters;
         return this;
     }
-
-//    public TradingRecord getTradingRecord() {
-//        return tradingRecord;
-//    }
-//
-//    public Strategist tradingRecord(TradingRecord tradingRecord) {
-//        this.tradingRecord = tradingRecord;
-//        return this;
-//    }
-
-//    public void setTradingRecord(TradingRecord tradingRecord) {
-//        this.tradingRecord = tradingRecord;
-//    }
 
     @Override
     public boolean equals(Object o) {
