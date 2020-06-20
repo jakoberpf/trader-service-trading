@@ -42,7 +42,7 @@ public class TraderPackage implements SignalListener {
     @Handler
     @SuppressWarnings("unused")
     private void handleSignal(SignalMessage signalMessage) {
-        LOGGER.warn("Got SIGNAL {}", signalMessage);
+        LOGGER.warn("Got SIGNAL {}", signalMessage.toString());
         if (trader.isLive()) {
             if (signalMessage.getSignal().equals(ENTER) && !trader.isIn()) {
                 LOGGER.info("Got ENTER");

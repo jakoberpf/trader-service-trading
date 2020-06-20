@@ -61,4 +61,16 @@ public class SignalMessage {
     public STRATEGY getStrategy() {
         return strategy;
     }
+
+    @Override
+    public String toString() {
+        return "SignalMessage{" +
+            "timestamp=" + timestamp +
+            ", signal=" + signal +
+            ", market=" + market +
+            ", symbol=" + symbol +
+            ", interval=" + interval +
+            ", strategy=" + strategy +
+            '}';
+    }
 }

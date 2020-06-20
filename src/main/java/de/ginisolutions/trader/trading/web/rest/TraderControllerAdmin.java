@@ -1,22 +1,17 @@
 package de.ginisolutions.trader.trading.web.rest;
 
 import de.ginisolutions.trader.trading.service.TraderService;
-import de.ginisolutions.trader.trading.service.dto.TraderPOST;
 import de.ginisolutions.trader.trading.service.dto.TraderGET;
+import de.ginisolutions.trader.trading.service.dto.TraderPOST;
 import de.ginisolutions.trader.trading.service.dto.TraderPUT;
 import de.ginisolutions.trader.trading.web.rest.errors.BadRequestAlertException;
-import de.ginisolutions.trader.trading.service.dto.TraderDTO;
-
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -26,13 +21,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * REST controller for adding/updating/removing {@link de.ginisolutions.trader.trading.domain.Trader}.
+ * REST admin controller for managing {@link de.ginisolutions.trader.trading.domain.Trader}.
  */
 @RestController
-@RequestMapping("/api")
-public class TraderResource {
+@RequestMapping("/api/admin")
+public class TraderControllerAdmin {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TraderResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TraderControllerAdmin.class);
 
     private static final String ENTITY_NAME = "traderServiceTradingTrader";
 
@@ -41,7 +36,7 @@ public class TraderResource {
 
     private final TraderService traderService;
 
-    public TraderResource(TraderService traderService) {
+    public TraderControllerAdmin(TraderService traderService) {
         LOGGER.info("Constructing TraderResource");
         this.traderService = traderService;
     }
@@ -54,6 +49,7 @@ public class TraderResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/traders")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TraderGET> createTrader(@Valid @RequestBody TraderPOST traderPOST) throws URISyntaxException {
         LOGGER.debug("REST request to save Trader : {}", traderPOST);
         TraderGET result = traderService.create(traderPOST);
@@ -72,6 +68,7 @@ public class TraderResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/traders")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TraderGET> updateTrader(@Valid @RequestBody TraderPUT traderPUT) throws URISyntaxException {
         LOGGER.debug("REST request to update Trader : {}", traderPUT);
         if (traderPUT.getId() == null) {
@@ -95,6 +92,7 @@ public class TraderResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of traders in body.
      */
     @GetMapping("/traders")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<TraderGET> getAllTraders() {
         LOGGER.debug("REST request to get all Traders");
         return traderService.findAll();
@@ -107,6 +105,7 @@ public class TraderResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the traderDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/traders/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TraderGET> getTrader(@PathVariable String id) {
         LOGGER.debug("REST request to get Trader : {}", id);
         Optional<TraderGET> traderGET = traderService.findOne(id);
@@ -120,23 +119,11 @@ public class TraderResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/traders/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteTrader(@PathVariable String id) {
         LOGGER.debug("REST request to delete Trader : {}", id);
 
         traderService.delete(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id)).build();
-    }
-
-    /**
-     * @return an optional of the username of the currently authenticated user/principal
-     */
-    private static Optional<String> getUsernameFromAuthentication() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Optional<String> username = Optional.empty();
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            username = Optional.of(userDetails.getUsername());
-        }
-        return username;
     }
 }
