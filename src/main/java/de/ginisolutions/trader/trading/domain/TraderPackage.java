@@ -45,7 +45,7 @@ public class TraderPackage implements SignalListener {
         LOGGER.warn("Got SIGNAL {}", signalMessage.toString());
         if (trader.isLive()) {
             if (signalMessage.getSignal().equals(ENTER) && !trader.isIn()) {
-                LOGGER.info("Got ENTER");
+                LOGGER.info("I should ENTER");
                 if (!trader.isIn()) {
                     try {
                         this.accountImpl.makeOrder(trader.getSymbol(), getTrader().getBudget(), BUY);
@@ -60,7 +60,7 @@ public class TraderPackage implements SignalListener {
                 }
             }
             if (signalMessage.getSignal().equals(EXIT) && trader.isIn()) {
-                LOGGER.info("Got EXIT");
+                LOGGER.info("I should EXIT");
                 if (trader.isIn()) {
                     try {
                         this.accountImpl.makeOrder(trader.getSymbol(), getTrader().getBudget(), SELL);
