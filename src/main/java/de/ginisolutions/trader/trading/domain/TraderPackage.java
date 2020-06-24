@@ -44,7 +44,7 @@ public class TraderPackage implements SignalListener {
     private void handleSignal(SignalMessage signalMessage) {
         LOGGER.warn("Got SIGNAL {}", signalMessage.toString());
         if (trader.isLive()) {
-            if (signalMessage.getSignal().equals(ENTER) && !trader.isIn()) {
+            if (signalMessage.getSignal().equals(ENTER)) {
                 LOGGER.info("I should ENTER");
                 if (!trader.isIn()) {
                     try {
@@ -59,7 +59,7 @@ public class TraderPackage implements SignalListener {
                     LOGGER.info("Trader already entered, no order will be placed");
                 }
             }
-            if (signalMessage.getSignal().equals(EXIT) && trader.isIn()) {
+            if (signalMessage.getSignal().equals(EXIT)) {
                 LOGGER.info("I should EXIT");
                 if (trader.isIn()) {
                     try {
@@ -74,6 +74,8 @@ public class TraderPackage implements SignalListener {
                     LOGGER.info("Trader already exited, no order will be placed");
                 }
             }
+        } else {
+            LOGGER.debug("Trader is not live, no order will be placed");
         }
     }
 

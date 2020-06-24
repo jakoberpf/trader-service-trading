@@ -1,8 +1,8 @@
 package de.ginisolutions.trader.trading.management;
 
-import de.ginisolutions.trader.common.strategy.parameter.ParameterCommodityChannelIndex;
-import de.ginisolutions.trader.common.strategy.parameter.ParameterMovingMomentum;
-import de.ginisolutions.trader.common.strategy.parameter.ParameterRelativeStrengthIndex;
+import de.ginisolutions.trader.common.strategy.parameter.ParameterCCI;
+import de.ginisolutions.trader.common.strategy.parameter.ParameterMM;
+import de.ginisolutions.trader.common.strategy.parameter.ParameterRSI;
 import de.ginisolutions.trader.common.strategy.parameter.StrategyParameter;
 import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
 import de.ginisolutions.trader.history.domain.enumeration.MARKET;
@@ -100,19 +100,17 @@ public class StrategistManager {
 
         // TODO simplify after testing
         // TODO get parameters from current learning status or repository
+
         final StrategyParameter parameters;
         switch (strategy) {
             case MM:
-                parameters = new ParameterMovingMomentum(10, 30, 14, 9, 26, 18, 20);
+                parameters = new ParameterMM(10, 30, 14, 9, 26, 18, 20);
                 break;
             case RSI:
-                parameters = new ParameterRelativeStrengthIndex(10, 200, 2, 5, 95);
+                parameters = new ParameterRSI(10, 200, 2, 5, 95);
                 break;
             case CCI:
-                parameters = new ParameterCommodityChannelIndex(200, -5, 100, -100, 5);
-                break;
-            case SAMPLE_ENUM:
-                parameters = null;
+                parameters = new ParameterCCI(200, -5, 100, -100, 5);
                 break;
             default:
                 throw new IllegalArgumentException("this is not allowed" + strategy);
