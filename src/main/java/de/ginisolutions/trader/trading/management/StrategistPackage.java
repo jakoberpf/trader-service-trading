@@ -1,13 +1,13 @@
-package de.ginisolutions.trader.trading.domain;
+package de.ginisolutions.trader.trading.management;
 
 import de.ginisolutions.trader.common.messaging.TickListener;
+import de.ginisolutions.trader.common.model.tick.CommonTick;
 import de.ginisolutions.trader.common.strategy.StrategyFactory;
-import de.ginisolutions.trader.history.domain.TickPackage;
 import de.ginisolutions.trader.common.enumeration.SIGNAL;
 import de.ginisolutions.trader.common.messaging.SignalListener;
 import de.ginisolutions.trader.common.messaging.SignalMessage;
 import de.ginisolutions.trader.common.messaging.SignalPublisher;
-import de.ginisolutions.trader.trading.management.HistoryProvider;
+import de.ginisolutions.trader.trading.domain.Strategist;
 import net.engio.mbassy.listener.Handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +22,8 @@ import java.time.*;
  * It is instantiate for every strategist in the database at application startup and handles
  * the running of the strategy defined in the strategist. I consumes tick events, when a
  * new tick is published by the history service or the internal crawler (which ever comes first)
+ *
+ * @author <a href="mailto:contact@jakoberpf.de">Jakob Erpf</a>
  */
 public class StrategistPackage implements TickListener {
 
@@ -34,10 +36,10 @@ public class StrategistPackage implements TickListener {
     private final SignalPublisher publisher;
 
     @NotNull
-    private final Strategy strategy;
+    private Strategy strategy;
 
     @NotNull
-    private final BarSeries barSeries;
+    private BarSeries barSeries;
 
     @NotNull
     private TradingRecord tradingRecord;
@@ -51,25 +53,25 @@ public class StrategistPackage implements TickListener {
     }
 
     /**
-     * @param tickPackage
+     * @param commonTick
      */
     @Handler
-    public void handleTick(TickPackage tickPackage) {
+    public void handleTick(CommonTick commonTick) {
         LOGGER.debug("Received tick message");
-        if (tickPackage.getMarket().equals(this.strategist.getMarket()) &&
-            tickPackage.getSymbol().equals(this.strategist.getSymbol()) &&
-            tickPackage.getInterval().equals(this.strategist.getInterval())) {
-            if (ZonedDateTime.ofInstant(Instant.ofEpochMilli(tickPackage.getOpenTime()), ZoneId.systemDefault()).isAfter(this.barSeries.getLastBar().getEndTime())) {
+        if (commonTick.getMarket().equals(this.strategist.getMarket()) &&
+            commonTick.getSymbol().equals(this.strategist.getSymbol()) &&
+            commonTick.getInterval().equals(this.strategist.getInterval())) {
+            if (ZonedDateTime.ofInstant(Instant.ofEpochMilli(commonTick.getOpenTime()), ZoneId.systemDefault()).isAfter(this.barSeries.getLastBar().getEndTime())) {
                 this.barSeries.addBar(
-                    Duration.ofMillis(tickPackage.getInterval().getInterval() - 1),
-                    ZonedDateTime.ofInstant(Instant.ofEpochMilli(tickPackage.getCloseTime()), ZoneId.systemDefault()),
-                    tickPackage.getOpen(),
-                    tickPackage.getHigh(),
-                    tickPackage.getLow(),
-                    tickPackage.getClose(),
-                    tickPackage.getVolume()
+                    Duration.ofMillis(commonTick.getInterval().getInterval() - 1),
+                    ZonedDateTime.ofInstant(Instant.ofEpochMilli(commonTick.getCloseTime()), ZoneId.systemDefault()),
+                    commonTick.getOpen(),
+                    commonTick.getHigh(),
+                    commonTick.getLow(),
+                    commonTick.getClose(),
+                    commonTick.getVolume()
                 );
-                LOGGER.info("Added tick to bar series -> " + tickPackage.toString());
+                LOGGER.info("Added tick to bar series -> " + commonTick.toString());
                 this.decide();
             } else {
                 // TODO update last bar
@@ -81,7 +83,7 @@ public class StrategistPackage implements TickListener {
     /**
      *
      */
-    public void decide() {
+    private void decide() {
         final Bar newBar = this.barSeries.getLastBar();
         final int endIndex = this.barSeries.getEndIndex();
         if (strategy.shouldEnter(endIndex)) {
@@ -96,6 +98,14 @@ public class StrategistPackage implements TickListener {
         }
     }
 
+    /**
+     *
+     */
+    public void reload(HistoryProvider historyProvider) {
+        this.barSeries = historyProvider.getInitialBarSeries(strategist.getMarket(), strategist.getSymbol(), strategist.getInterval());
+        this.tradingRecord = new BaseTradingRecord();
+        this.strategy = StrategyFactory.buildStrategy(this.barSeries, strategist.getStrategy(), strategist.getParameters());
+    }
     /**
      * @param listener
      */

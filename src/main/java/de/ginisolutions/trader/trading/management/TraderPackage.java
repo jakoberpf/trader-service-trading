@@ -1,4 +1,4 @@
-package de.ginisolutions.trader.trading.domain;
+package de.ginisolutions.trader.trading.management;
 
 import com.binance.api.client.domain.account.NewOrderResponse;
 import de.ginisolutions.trader.common.enumeration.ORDER;
@@ -7,6 +7,7 @@ import de.ginisolutions.trader.common.market.AccountImpl;
 import de.ginisolutions.trader.common.market.AccountImplFactory;
 import de.ginisolutions.trader.common.messaging.SignalListener;
 import de.ginisolutions.trader.common.messaging.SignalMessage;
+import de.ginisolutions.trader.trading.domain.Trader;
 import de.ginisolutions.trader.trading.domain.model.Trade;
 import net.engio.mbassy.listener.Handler;
 import org.slf4j.Logger;
@@ -24,6 +25,8 @@ import static de.ginisolutions.trader.common.enumeration.SIGNAL.EXIT;
  * The TraderPackage entity contains the Trader entity and some simple business logic.
  * Is is instantiated for every Trader in the database at application startup and handles
  * the business logic of entering/exciting assets.
+ *
+ * @author <a href="mailto:contact@jakoberpf.de">Jakob Erpf</a>
  */
 public class TraderPackage implements SignalListener {
 
@@ -75,7 +78,6 @@ public class TraderPackage implements SignalListener {
     }
 
     /**
-     *
      * @param signalMessage
      * @param order
      * @param signal

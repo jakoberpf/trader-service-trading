@@ -1,4 +1,4 @@
-package de.ginisolutions.trader.trading.domain;
+package de.ginisolutions.trader.trading.domain.model;
 
 import de.ginisolutions.trader.common.enumeration.ORDER;
 import de.ginisolutions.trader.common.enumeration.SIGNAL;
