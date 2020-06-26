@@ -1,12 +1,12 @@
 package de.ginisolutions.trader.trading.web.rest;
 
-import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
-import de.ginisolutions.trader.history.domain.enumeration.MARKET;
-import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
+import de.ginisolutions.trader.common.enumeration.INTERVAL;
+import de.ginisolutions.trader.common.enumeration.MARKET;
+import de.ginisolutions.trader.common.enumeration.SYMBOL;
 import de.ginisolutions.trader.trading.TraderServiceTradingApp;
 import de.ginisolutions.trader.trading.config.TestSecurityConfiguration;
 import de.ginisolutions.trader.trading.domain.Trader;
-import de.ginisolutions.trader.trading.domain.enumeration.STRATEGY;
+import de.ginisolutions.trader.common.enumeration.STRATEGY;
 import de.ginisolutions.trader.trading.management.TraderManager;
 import de.ginisolutions.trader.trading.repository.TraderRepository;
 import de.ginisolutions.trader.trading.service.TraderService;

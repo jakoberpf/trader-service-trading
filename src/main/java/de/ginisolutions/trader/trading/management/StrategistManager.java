@@ -4,13 +4,12 @@ import de.ginisolutions.trader.common.strategy.parameter.ParameterCCI;
 import de.ginisolutions.trader.common.strategy.parameter.ParameterMM;
 import de.ginisolutions.trader.common.strategy.parameter.ParameterRSI;
 import de.ginisolutions.trader.common.strategy.parameter.StrategyParameter;
-import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
-import de.ginisolutions.trader.history.domain.enumeration.MARKET;
-import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
+import de.ginisolutions.trader.common.enumeration.INTERVAL;
+import de.ginisolutions.trader.common.enumeration.MARKET;
+import de.ginisolutions.trader.common.enumeration.SYMBOL;
 import de.ginisolutions.trader.trading.domain.Strategist;
-import de.ginisolutions.trader.trading.domain.StrategistPackage;
-import de.ginisolutions.trader.trading.domain.enumeration.STRATEGY;
-import de.ginisolutions.trader.trading.messaging.SignalListener;
+import de.ginisolutions.trader.common.enumeration.STRATEGY;
+import de.ginisolutions.trader.common.messaging.SignalListener;
 import de.ginisolutions.trader.trading.repository.StrategistRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,25 +96,6 @@ public class StrategistManager {
      */
     public void subscribe(MARKET market, SYMBOL symbol, INTERVAL interval, STRATEGY strategy, SignalListener listener) {
         LOGGER.debug("Subscribing {} to {} {} {} {}", listener, market, symbol, interval, strategy);
-
-        // TODO simplify after testing
-        // TODO get parameters from current learning status or repository
-
-        final StrategyParameter parameters;
-        switch (strategy) {
-            case MM:
-                parameters = new ParameterMM(10, 30, 14, 9, 26, 18, 20);
-                break;
-            case RSI:
-                parameters = new ParameterRSI(10, 200, 2, 5, 95);
-                break;
-            case CCI:
-                parameters = new ParameterCCI(200, -5, 100, -100, 5);
-                break;
-            default:
-                throw new IllegalArgumentException("this is not allowed" + strategy);
-        }
-
         final String key = market.toString() + "-" + symbol.toString() + "-" + interval.toString() + "-" + strategy.toString();
         final StrategistPackage strategistPackage = this.strategistMap.get(key);
         if (strategistPackage != null) {
@@ -123,7 +103,7 @@ public class StrategistManager {
             strategistPackage.subscribe(listener);
         } else {
             // create a new strategist with package
-            final Strategist strategist = this.strategistRepository.save(new Strategist(strategy, market, symbol, interval, parameters));
+            final Strategist strategist = this.strategistRepository.save(new Strategist(strategy, market, symbol, interval, null)); // TODO get parameters from analysis service
             final StrategistPackage newStrategistPackage = new StrategistPackage(strategist, this.historyProvider);
             // subscribe strategist to crawler
             this.historyManager.subscribe2crawler(strategist.getMarket(), strategist.getSymbol(), strategist.getInterval(), newStrategistPackage);

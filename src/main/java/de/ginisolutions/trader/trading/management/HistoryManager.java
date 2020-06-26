@@ -2,11 +2,10 @@ package de.ginisolutions.trader.trading.management;
 
 import de.ginisolutions.trader.common.market.CrawlerImpl;
 import de.ginisolutions.trader.common.market.CrawlerImplFactory;
-import de.ginisolutions.trader.common.messaging.BaseListener;
 import de.ginisolutions.trader.common.messaging.TickListener;
-import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
-import de.ginisolutions.trader.history.domain.enumeration.MARKET;
-import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
+import de.ginisolutions.trader.common.enumeration.INTERVAL;
+import de.ginisolutions.trader.common.enumeration.MARKET;
+import de.ginisolutions.trader.common.enumeration.SYMBOL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

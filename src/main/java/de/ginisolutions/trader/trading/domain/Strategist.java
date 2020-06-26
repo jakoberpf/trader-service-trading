@@ -1,21 +1,21 @@
 package de.ginisolutions.trader.trading.domain;
 
-import de.ginisolutions.trader.common.strategy.parameter.StrategyParameter;
-import de.ginisolutions.trader.history.domain.enumeration.INTERVAL;
-import de.ginisolutions.trader.history.domain.enumeration.MARKET;
-import de.ginisolutions.trader.trading.domain.enumeration.STRATEGY;
-import de.ginisolutions.trader.history.domain.enumeration.SYMBOL;
+import de.ginisolutions.trader.common.enumeration.INTERVAL;
+import de.ginisolutions.trader.common.enumeration.MARKET;
+import de.ginisolutions.trader.common.enumeration.STRATEGY;
+import de.ginisolutions.trader.common.enumeration.SYMBOL;
+import de.ginisolutions.trader.common.strategy.StrategyFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-import org.ta4j.core.BaseTradingRecord;
-import org.ta4j.core.TradingRecord;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Map;
 
 /**
- * The Strategist entity.\n@author A true hipster
+ * The Strategist entity.
+ *
+ * @author <a href="mailto:contact@jakoberpf.de">Jakob Erpf</a>
  */
 @Document(collection = "strategist")
 public class Strategist implements Serializable {
@@ -38,17 +38,22 @@ public class Strategist implements Serializable {
     private INTERVAL interval;
 
     @Field("parameters")
-    private StrategyParameter parameters;
+    private Map<String, Double> parameters;
 
     public Strategist() {
     }
 
-    public Strategist(STRATEGY strategy, MARKET market, SYMBOL symbol, INTERVAL interval, StrategyParameter parameters) {
+    public Strategist(STRATEGY strategy, MARKET market, SYMBOL symbol, INTERVAL interval, Map<String, Double> parameters) {
         this.strategy = strategy;
         this.market = market;
         this.symbol = symbol;
         this.interval = interval;
-        this.parameters = parameters;
+        if (parameters != null) {
+            this.parameters = parameters;
+        } else {
+            StrategyFactory.buildDefaultParameterMap(strategy);
+        }
+
     }
 
     public String getId() {
@@ -111,15 +116,15 @@ public class Strategist implements Serializable {
         this.interval = interval;
     }
 
-    public StrategyParameter getParameters() {
+    public Map<String, Double> getParameters() {
         return parameters;
     }
 
-    public void setParameters(StrategyParameter parameters) {
+    public void setParameters(Map<String, Double> parameters) {
         this.parameters = parameters;
     }
 
-    public Strategist parameters(StrategyParameter parameters) {
+    public Strategist parameters(Map<String, Double> parameters) {
         this.parameters = parameters;
         return this;
     }
@@ -143,12 +148,12 @@ public class Strategist implements Serializable {
     @Override
     public String toString() {
         return "Strategist{" +
-                "id='" + id + '\'' +
-                ", strategy=" + strategy +
-                ", market=" + market +
-                ", symbol=" + symbol +
-                ", interval=" + interval +
-                ", parameters=" + parameters +
-                '}';
+            "id='" + id + '\'' +
+            ", strategy=" + strategy +
+            ", market=" + market +
+            ", symbol=" + symbol +
+            ", interval=" + interval +
+            ", parameters=" + parameters +
+            '}';
     }
 }

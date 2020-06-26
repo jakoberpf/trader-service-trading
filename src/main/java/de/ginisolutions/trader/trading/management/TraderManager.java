@@ -1,7 +1,6 @@
 package de.ginisolutions.trader.trading.management;
 
 import de.ginisolutions.trader.trading.domain.Trader;
-import de.ginisolutions.trader.trading.domain.TraderPackage;
 import de.ginisolutions.trader.trading.repository.TraderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

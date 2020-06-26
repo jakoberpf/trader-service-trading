@@ -1,7 +1,7 @@
 package de.ginisolutions.trader.trading.domain;
 
-import de.ginisolutions.trader.trading.domain.enumeration.ORDER;
-import de.ginisolutions.trader.trading.domain.enumeration.SIGNAL;
+import de.ginisolutions.trader.common.enumeration.ORDER;
+import de.ginisolutions.trader.common.enumeration.SIGNAL;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;

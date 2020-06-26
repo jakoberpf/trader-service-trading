@@ -1,6 +1,6 @@
 package de.ginisolutions.trader.trading.service.dto;
 
-import de.ginisolutions.trader.trading.domain.enumeration.STRATEGY;
+import de.ginisolutions.trader.common.enumeration.STRATEGY;
 import io.swagger.annotations.ApiModel;
 
 import javax.validation.constraints.NotNull;
