@@ -39,7 +39,7 @@ public class TraderMapperTest {
 
     private static final STRATEGY ENTITY_STRATEGY = STRATEGY.RSI;
     private static final STRATEGY CREATE_STRATEGY = STRATEGY.MM;
-    private static final STRATEGY UPDATE_STRATEGY = STRATEGY.CCI;
+    private static final STRATEGY UPDATE_STRATEGY = STRATEGY.CCIC;
 
     private static final String ENTITY_API_KEY = "AAAAAAAAAA";
     private static final String CREATE_API_KEY = "BBBBBBBBBB";
